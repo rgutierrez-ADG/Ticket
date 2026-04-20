@@ -224,6 +224,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .btn-send:hover{background:var(--green);color:#0f0f0f;}
 .btn-send:disabled{opacity:.4;cursor:not-allowed;}
 
+/* PDF BUTTON */
+.btn-pdf{
+  width:100%;padding:13px;background:transparent;border:1.5px solid #e07b00;
+  color:#e07b00;font-family:var(--mono);font-size:12px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;border-radius:4px;cursor:pointer;
+  margin-top:10px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-pdf:hover{background:#e07b00;color:#0f0f0f;}
+.btn-pdf:disabled{opacity:.4;cursor:not-allowed;}
+
 /* TOAST */
 .toast{
   position:fixed;bottom:24px;right:24px;background:var(--green);color:#0f0f0f;
@@ -366,6 +376,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <!-- BOTONES -->
     <button class="btn-generate" onclick="generateTicket()">⚙ Generar Vista Previa</button>
     <button class="btn-send" id="btnSend" onclick="sendEmail()" disabled>✉ Enviar por Mail</button>
+    <button class="btn-pdf" id="btnPDF" onclick="downloadPDF()" disabled>⬇ Descargar PDF</button>
 
   </div>
 
@@ -657,6 +668,7 @@ function generateTicket() {
 
   document.getElementById('previewArea').innerHTML = html;
   document.getElementById('btnSend').disabled = false;
+  document.getElementById('btnPDF').disabled = false;
   ticketGenerated = true;
 }
 
@@ -714,11 +726,97 @@ Saludos,
 Depto. Sanidad & Seguridad — Planta`
   );
 
-  window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+  window.location.href = `mailto:${to}?from=mdip@maniagro.com&subject=${subject}&body=${body}`;
 
   const toast = document.getElementById('toast');
   toast.style.display = 'block';
   setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+
+// ==================== DESCARGAR PDF ====================
+function downloadPDF() {
+  const ticket = document.getElementById('previewArea').querySelector('.ticket');
+  if (!ticket) return;
+
+  const tNum = getTicketNum().replace('#','').replace(/\//g,'-');
+
+  const printWin = window.open('', '_blank', 'width=800,height=900');
+  printWin.document.write(`<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>Ticket Fumigacion ${tNum}</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#f5f3ee;font-family:'IBM Plex Sans',sans-serif;padding:30px;}
+  @media print{body{padding:0;background:#fff;}}
+  .ticket{background:#fff;border:1.5px solid #d6d0c4;border-radius:4px;overflow:hidden;max-width:680px;margin:0 auto;}
+  .t-header{background:#1a1a1a;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .t-id{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#f0c400;letter-spacing:1px;}
+  .t-title{padding:20px 20px 14px;border-bottom:2px solid #f0c400;display:flex;gap:14px;align-items:flex-start;}
+  .t-icon{width:44px;height:44px;background:#f0c400;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .t-title-text h2{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;text-transform:uppercase;line-height:1.2;color:#1a1a1a;}
+  .t-title-text h2 span{color:#c0392b;}
+  .t-title-text p{font-size:11px;color:#666;margin-top:4px;}
+  .t-meta{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #e8e5de;}
+  .t-meta-item{padding:10px 14px;border-right:1px solid #e8e5de;}
+  .t-meta-item:last-child{border-right:none;}
+  .t-meta-lbl{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:3px;}
+  .t-meta-val{font-size:12px;font-weight:600;color:#1a1a1a;}
+  .t-meta-val.red{color:#c0392b;}
+  .t-section{padding:14px 20px;border-bottom:1px solid #e8e5de;}
+  .t-section:last-child{border-bottom:none;}
+  .t-sec-lbl{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #e8e5de;}
+  .t-desc{font-size:12px;line-height:1.6;color:#1a1a1a;}
+  .t-desc strong{color:#c0392b;font-weight:700;}
+  .t-sectors{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;}
+  .t-sector{background:#f5f3ee;border:1.5px solid #d6d0c4;border-left:3px solid #c49f00;padding:5px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;border-radius:2px;}
+  .t-operators{display:flex;gap:8px;flex-wrap:wrap;}
+  .t-op{background:#f5f3ee;border:1.5px solid #d6d0c4;padding:7px 10px;border-radius:3px;display:flex;align-items:center;gap:8px;}
+  .t-op-av{width:26px;height:26px;background:#1a1a1a;color:#f0c400;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;flex-shrink:0;}
+  .t-op-name{font-size:12px;font-weight:600;}
+  .t-op-role{font-size:10px;color:#666;}
+  .t-alert{background:#fdf2f1;border:1.5px solid #e8b4b0;border-left:4px solid #c0392b;border-radius:3px;padding:10px 12px;}
+  .t-alert-title{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:#c0392b;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;}
+  .t-alert ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+  .t-alert ul li{font-size:11.5px;color:#7a2020;padding-left:12px;position:relative;line-height:1.4;}
+  .t-alert ul li::before{content:"▶";position:absolute;left:0;font-size:8px;top:3px;color:#c0392b;}
+  .t-badge{display:inline-block;background:#c0392b;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:2px;margin-top:5px;text-transform:uppercase;font-weight:700;}
+  .t-timeline{display:flex;flex-direction:column;}
+  .t-tl-item{display:flex;gap:10px;position:relative;}
+  .t-tl-item::before{content:'';position:absolute;left:10px;top:24px;bottom:-4px;width:1px;background:#e8e5de;}
+  .t-tl-item:last-child::before{display:none;}
+  .t-tl-dot{width:22px;height:22px;border-radius:50%;border:2px solid #d6d0c4;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:2px;position:relative;z-index:1;}
+  .t-tl-dot.a{background:#f0c400;border-color:#c49f00;}
+  .t-tl-dot.e{background:#edf7f1;border-color:#1a7a4a;}
+  .t-tl-content{padding:3px 0 14px;}
+  .t-tl-date{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:#1a1a1a;}
+  .t-tl-desc{font-size:11px;color:#555;margin-top:2px;line-height:1.4;}
+  .t-contacts{display:flex;flex-direction:column;gap:6px;}
+  .t-contact{display:flex;align-items:center;justify-content:space-between;background:#f5f3ee;border:1.5px solid #d6d0c4;padding:7px 10px;border-radius:3px;}
+  .t-contact-name{font-size:12px;font-weight:600;}
+  .t-contact-phone{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;background:#fff;border:1px solid #d6d0c4;padding:2px 7px;border-radius:20px;}
+  .t-footer{background:#f5f3ee;border-top:1px solid #d6d0c4;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .t-footer-txt{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#888;letter-spacing:1px;}
+  .t-status{display:flex;align-items:center;gap:5px;background:#fff3cd;border:1px solid #f0c400;border-radius:20px;padding:2px 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;color:#7a5c00;letter-spacing:1px;text-transform:uppercase;}
+  .no-print{display:block;text-align:center;margin:20px auto 0;max-width:680px;}
+  @media print{.no-print{display:none;}}
+</style>
+</head>
+<body>
+${ticket.outerHTML}
+<div class="no-print">
+  <button onclick="window.print()" style="margin-top:16px;padding:10px 28px;background:#1a1a1a;color:#f0c400;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;">
+    🖨 IMPRIMIR / GUARDAR PDF
+  </button>
+</div>
+</body>
+</html>`);
+  printWin.document.close();
+  printWin.onload = () => {
+    setTimeout(() => printWin.print(), 500);
+  };
 }
 </script>
 </body>
