@@ -1,624 +1,725 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ticket de Fumigación – 17/04/2026</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg: #f5f3ee;
-      --card: #ffffff;
-      --yellow: #f0c400;
-      --yellow-dark: #c49f00;
-      --black: #1a1a1a;
-      --gray: #4a4a4a;
-      --light-gray: #e8e5de;
-      --danger: #c0392b;
-      --danger-bg: #fdf2f1;
-      --green: #1a7a4a;
-      --green-bg: #edf7f1;
-      --border: #d6d0c4;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>App Fumigación · Generador de Tickets</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface2: #242424;
+  --border: #2e2e2e;
+  --border2: #3a3a3a;
+  --yellow: #f0c400;
+  --yellow2: #c49f00;
+  --red: #e53935;
+  --red-bg: #1f1212;
+  --green: #22c55e;
+  --green-bg: #0d1f14;
+  --text: #f0ede8;
+  --text2: #9a9590;
+  --text3: #6a6560;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+/* LAYOUT */
+.app{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+@media(max-width:900px){.app{grid-template-columns:1fr;}}
 
-    body {
-      background: var(--bg);
-      font-family: 'IBM Plex Sans', sans-serif;
-      color: var(--black);
-      padding: 40px 20px;
-      min-height: 100vh;
-    }
+/* LEFT PANEL — FORM */
+.panel-form{
+  border-right:1px solid var(--border);
+  padding:32px 28px;
+  overflow-y:auto;
+  position:relative;
+}
+.panel-preview{
+  padding:32px 28px;
+  overflow-y:auto;
+  background:var(--surface);
+}
 
-    .wrapper {
-      max-width: 680px;
-      margin: 0 auto;
-    }
+/* APP HEADER */
+.app-header{display:flex;align-items:center;gap:12px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border);}
 
-    /* --- HEADER STRIP --- */
-    .header-strip {
-      background: var(--black);
-      color: var(--yellow);
-      padding: 12px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-radius: 4px 4px 0 0;
-    }
+.app-title{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text);}
+.app-sub{font-size:11px;color:var(--text3);margin-top:2px;letter-spacing:0.5px;}
 
-    .header-strip .org {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      opacity: 0.7;
-      color: #fff;
-    }
+/* SECTION LABELS */
+.form-section{margin-bottom:24px;}
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 
-    .header-strip .ticket-id {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: var(--yellow);
-    }
+/* INPUTS */
+.form-group{margin-bottom:14px;}
+.form-label{font-size:11px;color:var(--text2);margin-bottom:6px;display:block;font-weight:500;}
+.form-input, .form-select{
+  width:100%;background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);font-family:var(--sans);font-size:13px;
+  padding:10px 12px;border-radius:4px;outline:none;transition:border-color .2s;
+}
+.form-input:focus, .form-select:focus{border-color:var(--yellow);}
+.form-input[type="date"], .form-input[type="time"]{cursor:pointer;}
+.form-input[type="date"]::-webkit-calendar-picker-indicator,
+.form-input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(0.7) sepia(1) saturate(4) hue-rotate(5deg);cursor:pointer;}
 
-    /* --- MAIN CARD --- */
-    .card {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 4px 4px;
-      overflow: hidden;
-    }
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
-    /* --- TITLE BLOCK --- */
-    .title-block {
-      padding: 28px 28px 20px;
-      border-bottom: 2px solid var(--yellow);
-      display: flex;
-      align-items: flex-start;
-      gap: 18px;
-    }
+/* SECTOR SELECTOR */
+.sector-dropdown{position:relative;}
+.sector-trigger{
+  width:100%;background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);font-size:13px;padding:10px 12px;border-radius:4px;
+  cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+  user-select:none;transition:border-color .2s;
+}
+.sector-trigger:hover,.sector-trigger.open{border-color:var(--yellow);}
+.sector-trigger .arrow{transition:transform .2s;font-size:10px;color:var(--text2);}
+.sector-trigger.open .arrow{transform:rotate(180deg);}
+.sector-panel{
+  position:absolute;top:calc(100% + 4px);left:0;right:0;
+  background:var(--surface2);border:1px solid var(--yellow);border-radius:4px;
+  z-index:50;overflow:hidden;
+  display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+}
+.sector-panel.open{display:block;}
+.sector-option{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  cursor:pointer;transition:background .15s;font-size:13px;
+}
+.sector-option:hover{background:var(--border);}
+.sector-option input[type="checkbox"]{
+  accent-color:var(--yellow);width:14px;height:14px;cursor:pointer;flex-shrink:0;
+}
+.sector-option label{cursor:pointer;flex:1;}
+.sector-divider{height:1px;background:var(--border);margin:2px 0;}
+.sector-actions{display:flex;gap:0;border-top:1px solid var(--border);}
+.sector-action-btn{
+  flex:1;padding:8px;font-size:11px;font-family:var(--mono);color:var(--text2);
+  background:none;border:none;cursor:pointer;letter-spacing:1px;
+  transition:color .15s, background .15s;
+}
+.sector-action-btn:hover{color:var(--yellow);background:var(--border);}
+.sector-action-btn:first-child{border-right:1px solid var(--border);}
 
-    .hazard-icon {
-      width: 52px;
-      height: 52px;
-      background: var(--yellow);
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      flex-shrink: 0;
-      box-shadow: 3px 3px 0 var(--yellow-dark);
-    }
+.sector-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:10px;}
+.chip{
+  background:var(--surface2);border:1px solid var(--border2);border-left:3px solid var(--yellow2);
+  font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:2px;
+  display:flex;align-items:center;gap:6px;color:var(--text);
+}
+.chip-remove{
+  background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;
+  padding:0;line-height:1;transition:color .15s;
+}
+.chip-remove:hover{color:var(--red);}
+.no-sectors{font-size:12px;color:var(--text3);font-style:italic;padding:2px 0;}
 
-    .title-text h1 {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: var(--black);
-      line-height: 1.2;
-    }
+/* EMAILS */
+.email-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.email-row{
+  display:flex;align-items:center;gap:8px;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:4px;padding:8px 12px;
+}
+.email-row .email-addr{flex:1;font-family:var(--mono);font-size:12px;color:var(--text2);}
+.email-row .email-name{font-size:12px;color:var(--text);margin-right:4px;}
+.email-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0;line-height:1;transition:color .15s;}
+.email-remove:hover{color:var(--red);}
+.add-email-row{display:flex;gap:8px;}
+.add-email-row .form-input{flex:1;}
+.btn-add{
+  background:var(--surface2);border:1px solid var(--border2);color:var(--text2);
+  font-family:var(--mono);font-size:11px;padding:10px 14px;border-radius:4px;
+  cursor:pointer;white-space:nowrap;letter-spacing:1px;transition:all .15s;
+}
+.btn-add:hover{border-color:var(--yellow);color:var(--yellow);}
 
-    .title-text h1 span {
-      color: var(--danger);
-    }
+/* GENERATE BUTTON */
+.btn-generate{
+  width:100%;padding:14px;background:var(--yellow);color:#0f0f0f;
+  font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;
+  transition:background .2s, transform .1s;margin-top:8px;
+}
+.btn-generate:hover{background:#ffd400;}
+.btn-generate:active{transform:scale(0.98);}
 
-    .title-text .subtitle {
-      font-size: 12px;
-      color: var(--gray);
-      margin-top: 5px;
-      font-weight: 400;
-      letter-spacing: 0.3px;
-    }
+/* PREVIEW PANEL */
+.preview-header{
+  font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text3);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;
+}
+.preview-header .preview-badge{
+  background:var(--border);border-radius:20px;padding:3px 10px;font-size:9px;
+  color:var(--text3);letter-spacing:2px;
+}
 
-    /* --- META ROW --- */
-    .meta-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border-bottom: 1.5px solid var(--light-gray);
-    }
+/* TICKET PREVIEW */
+.ticket{background:#ffffff;color:#1a1a1a;border-radius:4px;overflow:hidden;font-family:var(--sans);}
+.t-header{background:#1a1a1a;color:#f0c400;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
 
-    .meta-item {
-      padding: 14px 20px;
-      border-right: 1.5px solid var(--light-gray);
-    }
+.t-header .t-id{font-family:var(--mono);font-size:10px;color:#f0c400;letter-spacing:1px;}
+.t-title{padding:20px 20px 14px;border-bottom:2px solid #f0c400;display:flex;gap:14px;align-items:flex-start;}
+.t-icon{width:44px;height:44px;background:#f0c400;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:2px 2px 0 #c49f00;}
+.t-title-text h2{font-family:var(--mono);font-size:15px;font-weight:700;text-transform:uppercase;line-height:1.2;color:#1a1a1a;}
+.t-title-text h2 span{color:#c0392b;}
+.t-title-text p{font-size:11px;color:#666;margin-top:4px;}
+.t-meta{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #e8e5de;}
+.t-meta-item{padding:10px 14px;border-right:1px solid #e8e5de;}
+.t-meta-item:last-child{border-right:none;}
+.t-meta-lbl{font-family:var(--mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:3px;}
+.t-meta-val{font-size:12px;font-weight:600;color:#1a1a1a;}
+.t-meta-val.red{color:#c0392b;}
+.t-section{padding:16px 20px;border-bottom:1px solid #e8e5de;}
+.t-section:last-child{border-bottom:none;}
+.t-sec-lbl{font-family:var(--mono);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid #e8e5de;}
+.t-desc{font-size:12.5px;line-height:1.65;color:#1a1a1a;}
+.t-desc strong{color:#c0392b;font-weight:700;}
+.t-sectors{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.t-sector{background:#f5f3ee;border:1.5px solid #d6d0c4;border-left:3px solid #c49f00;padding:6px 10px;font-family:var(--mono);font-size:11px;font-weight:600;border-radius:2px;}
+.t-operators{display:flex;gap:10px;flex-wrap:wrap;}
+.t-op{background:#f5f3ee;border:1.5px solid #d6d0c4;padding:8px 12px;border-radius:3px;display:flex;align-items:center;gap:8px;}
+.t-op-av{width:28px;height:28px;background:#1a1a1a;color:#f0c400;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;}
+.t-op-name{font-size:12px;font-weight:600;}
+.t-op-role{font-size:10px;color:#666;}
+.t-alert{background:#fdf2f1;border:1.5px solid #e8b4b0;border-left:4px solid #c0392b;border-radius:3px;padding:12px 14px;}
+.t-alert-title{font-family:var(--mono);font-size:10px;font-weight:700;color:#c0392b;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.t-alert ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.t-alert ul li{font-size:12px;color:#7a2020;padding-left:14px;position:relative;line-height:1.5;}
+.t-alert ul li::before{content:"▶";position:absolute;left:0;font-size:8px;top:3px;color:#c0392b;}
+.t-badge{display:inline-block;background:#c0392b;color:#fff;font-family:var(--mono);font-size:9px;letter-spacing:1px;padding:2px 8px;border-radius:2px;margin-top:6px;text-transform:uppercase;font-weight:700;}
+.t-timeline{display:flex;flex-direction:column;}
+.t-tl-item{display:flex;gap:12px;position:relative;}
+.t-tl-item::before{content:'';position:absolute;left:11px;top:26px;bottom:-4px;width:1px;background:#e8e5de;}
+.t-tl-item:last-child::before{display:none;}
+.t-tl-dot{width:24px;height:24px;border-radius:50%;border:2px solid #d6d0c4;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px;position:relative;z-index:1;}
+.t-tl-dot.a{background:#f0c400;border-color:#c49f00;}
+.t-tl-dot.e{background:#edf7f1;border-color:#1a7a4a;}
+.t-tl-content{padding:4px 0 16px;}
+.t-tl-date{font-family:var(--mono);font-size:10px;font-weight:700;color:#1a1a1a;}
+.t-tl-desc{font-size:11.5px;color:#555;margin-top:2px;line-height:1.5;}
+.t-contacts{display:flex;flex-direction:column;gap:7px;}
+.t-contact{display:flex;align-items:center;justify-content:space-between;background:#f5f3ee;border:1.5px solid #d6d0c4;padding:8px 12px;border-radius:3px;}
+.t-contact-name{font-size:12px;font-weight:600;}
+.t-contact-phone{font-family:var(--mono);font-size:11px;color:#555;background:#fff;border:1px solid #d6d0c4;padding:2px 8px;border-radius:20px;}
+.t-footer{background:#f5f3ee;border-top:1px solid #d6d0c4;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
+.t-footer-txt{font-family:var(--mono);font-size:9px;color:#888;letter-spacing:1px;}
+.t-status{display:flex;align-items:center;gap:5px;background:#fff3cd;border:1px solid #f0c400;border-radius:20px;padding:3px 10px;font-family:var(--mono);font-size:9px;font-weight:700;color:#7a5c00;letter-spacing:1px;text-transform:uppercase;}
+.t-status-dot{width:6px;height:6px;border-radius:50%;background:#c49f00;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-    .meta-item:last-child { border-right: none; }
+/* SEND BUTTON */
+.btn-send{
+  width:100%;padding:13px;background:transparent;border:1.5px solid var(--green);
+  color:var(--green);font-family:var(--mono);font-size:12px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;border-radius:4px;cursor:pointer;
+  margin-top:16px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-send:hover{background:var(--green);color:#0f0f0f;}
+.btn-send:disabled{opacity:.4;cursor:not-allowed;}
 
-    .meta-item .label {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--gray);
-      margin-bottom: 4px;
-    }
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--green);color:#0f0f0f;
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:1px;
+  padding:12px 20px;border-radius:4px;display:none;z-index:100;
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 
-    .meta-item .value {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--black);
-    }
+/* EMPTY STATE */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:60%;gap:12px;opacity:.4;
+}
+.empty-state .empty-icon{font-size:48px;}
+.empty-state p{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;text-align:center;color:var(--text2);}
 
-    .meta-item .value.red { color: var(--danger); }
-    .meta-item .value.green { color: var(--green); }
+/* TICKET NUMBER */
+.ticket-num-display{
+  background:var(--surface2);border:1px solid var(--border2);border-radius:4px;
+  padding:10px 14px;font-family:var(--mono);font-size:12px;color:var(--yellow);
+  letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;
+}
+.btn-regen{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;transition:color .15s;}
+.btn-regen:hover{color:var(--yellow);}
 
-    /* --- BODY --- */
-    .body-section {
-      padding: 22px 28px;
-      border-bottom: 1.5px solid var(--light-gray);
-    }
-
-    .body-section:last-child { border-bottom: none; }
-
-    .section-title {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--gray);
-      margin-bottom: 14px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--light-gray);
-    }
-
-    /* Lead text */
-    .lead {
-      font-size: 13.5px;
-      line-height: 1.65;
-      color: var(--black);
-    }
-
-    .lead strong {
-      font-weight: 700;
-      color: var(--danger);
-    }
-
-    /* Sectors grid */
-    .sectors-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .sector-tag {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-left: 3px solid var(--yellow-dark);
-      padding: 8px 12px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--black);
-      border-radius: 2px;
-    }
-
-    /* Operators */
-    .operators-list {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .operator-card {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      padding: 10px 16px;
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .operator-avatar {
-      width: 32px;
-      height: 32px;
-      background: var(--black);
-      color: var(--yellow);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .operator-name {
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .operator-role {
-      font-size: 11px;
-      color: var(--gray);
-    }
-
-    /* Safety alert */
-    .alert-box {
-      background: var(--danger-bg);
-      border: 1.5px solid #e8b4b0;
-      border-left: 4px solid var(--danger);
-      border-radius: 3px;
-      padding: 14px 16px;
-    }
-
-    .alert-box .alert-title {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--danger);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .alert-box ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .alert-box ul li {
-      font-size: 13px;
-      color: #7a2020;
-      padding-left: 16px;
-      position: relative;
-      line-height: 1.5;
-    }
-
-    .alert-box ul li::before {
-      content: "▶";
-      position: absolute;
-      left: 0;
-      font-size: 9px;
-      top: 3px;
-      color: var(--danger);
-    }
-
-    .prohibited-badge {
-      display: inline-block;
-      background: var(--danger);
-      color: #fff;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 1px;
-      padding: 3px 8px;
-      border-radius: 2px;
-      margin-top: 8px;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-
-    /* Timeline */
-    .timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .timeline-item {
-      display: flex;
-      gap: 16px;
-      position: relative;
-    }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: 14px;
-      top: 28px;
-      bottom: -4px;
-      width: 1px;
-      background: var(--border);
-    }
-
-    .timeline-item:last-child::before { display: none; }
-
-    .tl-dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      flex-shrink: 0;
-      margin-top: 2px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .tl-dot.active {
-      background: var(--yellow);
-      border-color: var(--yellow-dark);
-    }
-
-    .tl-dot.end {
-      background: var(--green-bg);
-      border-color: var(--green);
-    }
-
-    .tl-content {
-      padding: 4px 0 20px;
-    }
-
-    .tl-date {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--black);
-    }
-
-    .tl-desc {
-      font-size: 12.5px;
-      color: var(--gray);
-      margin-top: 2px;
-      line-height: 1.5;
-    }
-
-    /* Contacts */
-    .contacts-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .contact-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      padding: 10px 16px;
-      border-radius: 3px;
-    }
-
-    .contact-name {
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .contact-phone {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      color: var(--gray);
-      background: #fff;
-      border: 1px solid var(--border);
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
-
-    /* --- FOOTER --- */
-    .footer {
-      background: var(--bg);
-      border-top: 1.5px solid var(--border);
-      padding: 12px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .footer .generated {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      color: var(--gray);
-      letter-spacing: 1px;
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #fff3cd;
-      border: 1px solid #f0c400;
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      font-weight: 700;
-      color: #7a5c00;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--yellow-dark);
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    @media (max-width: 480px) {
-      .meta-row { grid-template-columns: 1fr 1fr; }
-      .meta-item:nth-child(3) { grid-column: 1 / -1; border-right: none; border-top: 1.5px solid var(--light-gray); }
-      .sectors-grid { grid-template-columns: 1fr; }
-      .operators-list { flex-direction: column; }
-      .header-strip { flex-direction: column; gap: 4px; align-items: flex-start; }
-    }
-  </style>
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
 </head>
 <body>
-<div class="wrapper">
+<div class="app">
 
-  <!-- HEADER STRIP -->
-  <div class="header-strip">
-    <span class="org">⚙ Planta — Depto. Sanidad & Seguridad</span>
-    <span class="ticket-id">#FUM-2604-001</span>
-  </div>
+  <!-- ====== PANEL IZQUIERDO: FORMULARIO ====== -->
+  <div class="panel-form">
 
-  <div class="card">
-
-    <!-- TITLE BLOCK -->
-    <div class="title-block">
-      <div class="hazard-icon">⚠️</div>
-      <div class="title-text">
-        <h1>Aviso de <span>Fumigación</span><br>con Fosfuro de Aluminio</h1>
-        <p class="subtitle">Notificación oficial · Requiere difusión inmediata a todo el personal</p>
+    <div class="app-header">
+      <img src="data:image/jpeg;base64,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" alt="Maniagro Argentina" style="height:48px;width:auto;border-radius:3px;"/>
+      <div>
+        <div class="app-title">Generador de Tickets</div>
+        <div class="app-sub">Fumigación con Fosfuro de Aluminio</div>
       </div>
     </div>
 
-    <!-- META ROW -->
-    <div class="meta-row">
-      <div class="meta-item">
-        <div class="label">Fecha de Inicio</div>
-        <div class="value">17/04/2026</div>
-      </div>
-      <div class="meta-item">
-        <div class="label">Hora de Inicio</div>
-        <div class="value red">15:45 hs</div>
-      </div>
-      <div class="meta-item">
-        <div class="label">Estado</div>
-        <div class="value red">⚠ En curso</div>
+    <!-- NÚMERO DE TICKET -->
+    <div class="form-section">
+      <div class="section-label">Identificación</div>
+      <div class="form-group">
+        <label class="form-label">Número de Ticket</label>
+        <div class="ticket-num-display">
+          <span id="ticketNumDisplay">#FUM-0001</span>
+          <button class="btn-regen" onclick="regenTicketNum()" title="Regenerar">↻ nuevo</button>
+        </div>
       </div>
     </div>
 
-    <!-- INTRO -->
-    <div class="body-section">
-      <div class="section-title">Descripción de la Operación</div>
-      <p class="lead">
-        El día <strong>viernes 17 de abril de 2026</strong>, a partir de las <strong>15:45 hs</strong>, 
-        se darán inicio a las actividades de <strong>fumigación con Fosfuro de Aluminio (PH₃)</strong> 
-        en los sectores listados a continuación. Se solicita la difusión inmediata de esta comunicación 
-        a todo el personal de planta.
-      </p>
+    <!-- FECHA Y HORA -->
+    <div class="form-section">
+      <div class="section-label">Fecha y Hora de Inicio</div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label">Fecha de inicio</label>
+          <input class="form-input" type="date" id="fechaInicio"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hora de inicio</label>
+          <input class="form-input" type="time" id="horaInicio"/>
+        </div>
+      </div>
     </div>
 
     <!-- SECTORES -->
-    <div class="body-section">
-      <div class="section-title">Sectores Afectados</div>
-      <div class="sectors-grid">
-        <div class="sector-tag">📦 Depósito D1</div>
-        <div class="sector-tag">📦 Depósito D2</div>
-        <div class="sector-tag">📦 Depósito D3</div>
-        <div class="sector-tag">🏭 Pulmón Blanch</div>
-        <div class="sector-tag">🏭 Pulmón HPS1</div>
-        <div class="sector-tag">🗄 Depósito de Insumos</div>
-      </div>
-    </div>
-
-    <!-- OPERARIOS -->
-    <div class="body-section">
-      <div class="section-title">Personal a Cargo</div>
-      <div class="operators-list">
-        <div class="operator-card">
-          <div class="operator-avatar">EP</div>
-          <div>
-            <div class="operator-name">Ezequiel Pereyra</div>
-            <div class="operator-role">Operario Fumigador</div>
+    <div class="form-section">
+      <div class="section-label">Sectores Afectados</div>
+      <div class="form-group">
+        <label class="form-label">Seleccionar sectores</label>
+        <div class="sector-dropdown">
+          <div class="sector-trigger" id="sectorTrigger" onclick="toggleSectorPanel()">
+            <span id="sectorTriggerText">Elegir sectores...</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="sector-panel" id="sectorPanel">
+            <div class="sector-option"><input type="checkbox" id="s1" value="Depósito D1" onchange="updateSectors()"><label for="s1">📦 Depósito D1</label></div>
+            <div class="sector-option"><input type="checkbox" id="s2" value="Depósito D2" onchange="updateSectors()"><label for="s2">📦 Depósito D2</label></div>
+            <div class="sector-option"><input type="checkbox" id="s3" value="Depósito D3" onchange="updateSectors()"><label for="s3">📦 Depósito D3</label></div>
+            <div class="sector-option"><input type="checkbox" id="s7" value="Producto Elaborado" onchange="updateSectors()"><label for="s7">📦 Producto Elaborado</label></div>
+            <div class="sector-divider"></div>
+            <div class="sector-option"><input type="checkbox" id="s4" value="Pulmón Blanch" onchange="updateSectors()"><label for="s4">🏭 Pulmón Blanch</label></div>
+            <div class="sector-option"><input type="checkbox" id="s5" value="Pulmón HPS1" onchange="updateSectors()"><label for="s5">🏭 Pulmón HPS1</label></div>
+            <div class="sector-option"><input type="checkbox" id="s8" value="Planta Alérgeno" onchange="updateSectors()"><label for="s8">🏭 Planta Alérgeno</label></div>
+            <div class="sector-option"><input type="checkbox" id="s9" value="Curado" onchange="updateSectors()"><label for="s9">🏭 Curado</label></div>
+            <div class="sector-option"><input type="checkbox" id="s10" value="Josa" onchange="updateSectors()"><label for="s10">🏭 Josa</label></div>
+            <div class="sector-option"><input type="checkbox" id="s11" value="Álvarez" onchange="updateSectors()"><label for="s11">🏭 Álvarez</label></div>
+            <div class="sector-divider"></div>
+            <div class="sector-option"><input type="checkbox" id="s6" value="Depósito de Insumos" onchange="updateSectors()"><label for="s6">🗄 Depósito de Insumos</label></div>
+            <div class="sector-actions">
+              <button class="sector-action-btn" onclick="selectAll()">TODOS</button>
+              <button class="sector-action-btn" onclick="clearAll()">NINGUNO</button>
+            </div>
           </div>
         </div>
-        <div class="operator-card">
-          <div class="operator-avatar">FG</div>
-          <div>
-            <div class="operator-name">Franco Gutiérrez</div>
-            <div class="operator-role">Operario Fumigador</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SEGURIDAD -->
-    <div class="body-section">
-      <div class="section-title">Medidas de Seguridad</div>
-      <div class="alert-box">
-        <div class="alert-title">⛔ Protocolo de Seguridad Activo</div>
-        <ul>
-          <li>Señalización con cartelería habilitada en todos los ingresos a los sectores afectados.</li>
-          <li>Control de presencia de Fosfina (PH₃) en el interior de los locales y medición de concentración en los encarpados.</li>
-          <li>Queda <strong>ESTRICTAMENTE PROHIBIDO</strong> circular o ingresar dentro del perímetro señalizado.</li>
-        </ul>
-        <div class="prohibited-badge">⛔ Zona Restringida · No ingresar</div>
-      </div>
-    </div>
-
-    <!-- TIMELINE -->
-    <div class="body-section">
-      <div class="section-title">Cronograma</div>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="tl-dot active">🚀</div>
-          <div class="tl-content">
-            <div class="tl-date">Vie 17/04/2026 — 15:45 hs</div>
-            <div class="tl-desc">Inicio de operaciones de fumigación. Sellado y señalización de sectores.</div>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="tl-dot">🔒</div>
-          <div class="tl-content">
-            <div class="tl-date">Vie 24/04/2026</div>
-            <div class="tl-desc">Fecha estimada de liberación de los sectores fumigados.</div>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="tl-dot end">✅</div>
-          <div class="tl-content">
-            <div class="tl-date">Lun 27/04/2026 — 6:00 hs</div>
-            <div class="tl-desc">Reinicio de actividades (previo a mediciones de concentración confirmadas). Acceso permitido solo tras habilitación técnica.</div>
-          </div>
+        <div class="sector-chips" id="sectorChips">
+          <span class="no-sectors">Ningún sector seleccionado</span>
         </div>
       </div>
     </div>
 
-    <!-- CONTACTOS -->
-    <div class="body-section">
-      <div class="section-title">Contactos ante Dudas o Emergencias</div>
-      <div class="contacts-list">
-        <div class="contact-row">
-          <div>
-            <div class="contact-name">Pereyra Isaías Ezequiel</div>
-            <div style="font-size:11px;color:var(--gray)">Responsable Técnico</div>
-          </div>
-          <div class="contact-phone">📞 358 514-5055</div>
+    <!-- CRONOGRAMA -->
+    <div class="form-section">
+      <div class="section-label">Cronograma</div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label">Fecha de liberación</label>
+          <input class="form-input" type="date" id="fechaLiberacion"/>
         </div>
-        <div class="contact-row">
-          <div>
-            <div class="contact-name">Gutiérrez Franco</div>
-            <div style="font-size:11px;color:var(--gray)">Operario a Cargo</div>
-          </div>
-          <div class="contact-phone">📞 358 487-4894</div>
+        <div class="form-group">
+          <label class="form-label">Fecha reinicio actividades</label>
+          <input class="form-input" type="date" id="fechaReinicio"/>
         </div>
-        <div class="contact-row">
-          <div>
-            <div class="contact-name">Mayra Dip</div>
-            <div style="font-size:11px;color:var(--gray)">Coordinación</div>
-          </div>
-          <div class="contact-phone">📞 349 341-8445</div>
-        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hora reinicio actividades</label>
+        <input class="form-input" type="time" id="horaReinicio" value="06:00"/>
       </div>
     </div>
 
-  </div><!-- /card -->
+    <!-- DESTINATARIOS EMAIL -->
+    <div class="form-section">
+      <div class="section-label">Destinatarios del Mail</div>
+      <div class="email-list" id="emailList"></div>
+      <div class="add-email-row">
+        <input class="form-input" type="text" id="newEmailName" placeholder="Nombre"/>
+        <input class="form-input" type="email" id="newEmailAddr" placeholder="email@empresa.com"/>
+        <button class="btn-add" onclick="addEmail()">+ Agregar</button>
+      </div>
+    </div>
 
-  <!-- FOOTER -->
-  <div class="footer">
-    <span class="generated">Generado: 17/04/2026 · #FUM-2604-001</span>
-    <div class="status-badge">
-      <div class="status-dot"></div>
-      Activo
+    <!-- BOTONES -->
+    <button class="btn-generate" onclick="generateTicket()">⚙ Generar Vista Previa</button>
+    <button class="btn-send" id="btnSend" onclick="sendEmail()" disabled>✉ Enviar por Mail</button>
+
+  </div>
+
+  <!-- ====== PANEL DERECHO: PREVIEW ====== -->
+  <div class="panel-preview">
+    <div class="preview-header">
+      <span>Vista previa del ticket</span>
+      <span class="preview-badge">LIVE PREVIEW</span>
+    </div>
+    <div id="previewArea">
+      <div class="empty-state">
+        <div class="empty-icon">🗂</div>
+        <p>Completá el formulario<br>y generá el ticket</p>
+      </div>
     </div>
   </div>
 
 </div>
+
+<div class="toast" id="toast">✓ Cliente de mail abierto</div>
+
+<script>
+// ==================== ESTADO ====================
+let ticketCounter = Math.floor(Math.random() * 900) + 100;
+let selectedSectors = [];
+let emails = [
+  { name: "Emilse Eroles",           addr: "eeroles@maniagro.com" },
+  { name: "Sergio Mignola",          addr: "smignola@croppers.com.ar" },
+  { name: "Rodrigo Gutierrez",       addr: "rgutierrez@maniagro.com" },
+  { name: "Rodrigo Quiroga",         addr: "rquiroga@maniagro.com" },
+  { name: "Mario Gimenez",           addr: "mgimenez@maniagro.com" },
+  { name: "Natacha Fernandez",       addr: "nfernandez@maniagro.com" },
+  { name: "Gaston Dolso",            addr: "gdolso@maniagro.com" },
+  { name: "Guardia ADG",             addr: "guardia@maniagro.com" },
+  { name: "Yamila Calgaro",          addr: "ycalgaro@maniagro.com" },
+  { name: "Alejandro Altamirano",    addr: "aaltamirano@maniagro.com" },
+  { name: "Amaro Molina",            addr: "amolina@maniagro.com.ar" },
+  { name: "Dianela Ramirez",         addr: "dramirez@maniagro.com" },
+  { name: "Capital Humano",          addr: "capitalhumano@maniagro.com" },
+  { name: "Nerea Malacarne",         addr: "nmalacarne@maniagro.com" },
+  { name: "Monica Quiroga",          addr: "mquiroga@maniagro.com" },
+  { name: "Maria Virginia Sommaro",  addr: "msommaro@maniagro.com" },
+  { name: "Micaela Cabrera",         addr: "mcabrera@maniagro.com" },
+  { name: "Ricardo Caprin",          addr: "rcaprin@maniagro.com" },
+  { name: "insumos",                 addr: "insumos@maniagro.com" },
+  { name: "David Lingua",            addr: "dlingua@maniagro.com" },
+  { name: "Karen Carrizo",           addr: "kcarrizo@maniagro.com" },
+  { name: "Maria Belen Bozzo",       addr: "mbozzo@maniagro.com" }
+];
+let ticketGenerated = false;
+
+// ==================== INIT ====================
+(function init() {
+  // Fecha de hoy por defecto
+  const today = new Date();
+  const fmt = d => d.toISOString().slice(0,10);
+  document.getElementById('fechaInicio').value = fmt(today);
+  document.getElementById('horaInicio').value  = '15:45';
+
+  const lib = new Date(today); lib.setDate(lib.getDate() + 7);
+  document.getElementById('fechaLiberacion').value = fmt(lib);
+
+  const rei = new Date(lib); rei.setDate(rei.getDate() + 3);
+  document.getElementById('fechaReinicio').value = fmt(rei);
+
+  updateTicketNum();
+  renderEmails();
+
+  // Cerrar dropdown al clickear fuera
+  document.addEventListener('click', e => {
+    const dd = document.getElementById('sectorPanel');
+    const tr = document.getElementById('sectorTrigger');
+    if (!dd.contains(e.target) && !tr.contains(e.target)) {
+      dd.classList.remove('open');
+      tr.classList.remove('open');
+    }
+  });
+})();
+
+// ==================== TICKET NUM ====================
+function updateTicketNum() {
+  const y = new Date().getFullYear().toString().slice(-2);
+  const m = String(new Date().getMonth()+1).padStart(2,'0');
+  document.getElementById('ticketNumDisplay').textContent =
+    `#FUM-${y}${m}-${String(ticketCounter).padStart(3,'0')}`;
+}
+function regenTicketNum() {
+  ticketCounter = Math.floor(Math.random()*900)+100;
+  updateTicketNum();
+  if (ticketGenerated) generateTicket();
+}
+function getTicketNum() { return document.getElementById('ticketNumDisplay').textContent; }
+
+// ==================== SECTORES ====================
+function toggleSectorPanel() {
+  document.getElementById('sectorPanel').classList.toggle('open');
+  document.getElementById('sectorTrigger').classList.toggle('open');
+}
+function updateSectors() {
+  const checks = document.querySelectorAll('#sectorPanel input[type="checkbox"]');
+  selectedSectors = Array.from(checks).filter(c=>c.checked).map(c=>c.value);
+  renderChips();
+  const tr = document.getElementById('sectorTrigger').querySelector('span');
+  tr.textContent = selectedSectors.length > 0
+    ? `${selectedSectors.length} sector${selectedSectors.length>1?'es':''} seleccionado${selectedSectors.length>1?'s':''}`
+    : 'Elegir sectores...';
+}
+function renderChips() {
+  const c = document.getElementById('sectorChips');
+  if (selectedSectors.length === 0) {
+    c.innerHTML = '<span class="no-sectors">Ningún sector seleccionado</span>'; return;
+  }
+  c.innerHTML = selectedSectors.map(s =>
+    `<div class="chip">${s}<button class="chip-remove" onclick="removeChip('${s}')">×</button></div>`
+  ).join('');
+}
+function removeChip(name) {
+  const ch = document.querySelector(`#sectorPanel input[value="${name}"]`);
+  if (ch) ch.checked = false;
+  updateSectors();
+}
+function selectAll() { document.querySelectorAll('#sectorPanel input').forEach(c=>c.checked=true); updateSectors(); }
+function clearAll()  { document.querySelectorAll('#sectorPanel input').forEach(c=>c.checked=false); updateSectors(); }
+
+// ==================== EMAILS ====================
+function renderEmails() {
+  const el = document.getElementById('emailList');
+  if (emails.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = emails.map((e,i) => `
+    <div class="email-row">
+      <div>
+        <span class="email-name">${e.name}</span>
+        <span class="email-addr">${e.addr}</span>
+      </div>
+      <button class="email-remove" onclick="removeEmail(${i})">×</button>
+    </div>`).join('');
+}
+function addEmail() {
+  const name = document.getElementById('newEmailName').value.trim();
+  const addr = document.getElementById('newEmailAddr').value.trim();
+  if (!addr.includes('@')) { alert('Ingresá un email válido.'); return; }
+  emails.push({ name: name || addr, addr });
+  document.getElementById('newEmailName').value = '';
+  document.getElementById('newEmailAddr').value = '';
+  renderEmails();
+}
+function removeEmail(i) { emails.splice(i,1); renderEmails(); }
+
+// ==================== FORMATO FECHAS ====================
+function fmtDate(str) {
+  if (!str) return '—';
+  const [y,m,d] = str.split('-');
+  const dias  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const dt = new Date(y,m-1,d);
+  return `${dias[dt.getDay()]} ${d}/${m}/${y}`;
+}
+function fmtDateLong(str) {
+  if (!str) return '—';
+  const [y,m,d] = str.split('-');
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return `${parseInt(d)} de ${meses[m-1]} de ${y}`;
+}
+function initials(name) {
+  const p = name.trim().split(' ');
+  return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();
+}
+
+// ==================== GENERAR TICKET ====================
+function generateTicket() {
+  const fi  = document.getElementById('fechaInicio').value;
+  const hi  = document.getElementById('horaInicio').value;
+  const fl  = document.getElementById('fechaLiberacion').value;
+  const fr  = document.getElementById('fechaReinicio').value;
+  const hr  = document.getElementById('horaReinicio').value;
+
+  if (!fi || !hi) { alert('Completá la fecha y hora de inicio.'); return; }
+  if (selectedSectors.length === 0) { alert('Seleccioná al menos un sector.'); return; }
+
+  const tNum = getTicketNum();
+  const hiFmt = hi.slice(0,5);
+  const hrFmt = hr.slice(0,5);
+
+  // Sectores HTML
+  const sectorsHTML = selectedSectors.map(s =>
+    `<div class="t-sector">📦 ${s}</div>`
+  ).join('');
+
+  // Operarios (fijos)
+  const ops = [
+    { name:'Ezequiel Pereyra', role:'Operario Fumigador' },
+    { name:'Franco Gutiérrez', role:'Operario Fumigador' }
+  ];
+  const opsHTML = ops.map(o => `
+    <div class="t-op">
+      <div class="t-op-av">${initials(o.name)}</div>
+      <div><div class="t-op-name">${o.name}</div><div class="t-op-role">${o.role}</div></div>
+    </div>`).join('');
+
+  // Contactos
+  const contacts = [
+    { name:'Pereyra Isaías Ezequiel', phone:'358 514-5055' },
+    { name:'Gutiérrez Franco',        phone:'358 487-4894' },
+    { name:'Mayra Dip',               phone:'349 341-8445' }
+  ];
+  const contactsHTML = contacts.map(c => `
+    <div class="t-contact">
+      <div class="t-contact-name">${c.name}</div>
+      <div class="t-contact-phone">📞 ${c.phone}</div>
+    </div>`).join('');
+
+  const html = `
+  <div class="ticket">
+    <div class="t-header">
+      <img src="data:image/jpeg;base64,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" alt="Maniagro Argentina" style="height:32px;width:auto;border-radius:2px;"/>
+      <span class="t-id">${tNum}</span>
+    </div>
+    <div class="t-title">
+      <div class="t-icon">⚠️</div>
+      <div class="t-title-text">
+        <h2>Aviso de <span>Fumigación</span><br>con Fosfuro de Aluminio</h2>
+        <p>Notificación oficial · Requiere difusión inmediata a todo el personal</p>
+      </div>
+    </div>
+    <div class="t-meta">
+      <div class="t-meta-item"><div class="t-meta-lbl">Fecha de Inicio</div><div class="t-meta-val">${fmtDate(fi)}</div></div>
+      <div class="t-meta-item"><div class="t-meta-lbl">Hora de Inicio</div><div class="t-meta-val red">${hiFmt} hs</div></div>
+      <div class="t-meta-item"><div class="t-meta-lbl">Estado</div><div class="t-meta-val red">⚠ Activo</div></div>
+    </div>
+    <div class="t-section">
+      <div class="t-sec-lbl">Descripción de la Operación</div>
+      <p class="t-desc">El día <strong>${fmtDateLong(fi)}</strong>, a partir de las <strong>${hiFmt} hs</strong>, se darán inicio a las actividades de <strong>fumigación con Fosfuro de Aluminio (PH₃)</strong> en los sectores indicados. Se solicita la difusión inmediata a todo el personal de planta.</p>
+    </div>
+    <div class="t-section">
+      <div class="t-sec-lbl">Sectores Afectados</div>
+      <div class="t-sectors">${sectorsHTML}</div>
+    </div>
+    <div class="t-section">
+      <div class="t-sec-lbl">Personal a Cargo</div>
+      <div class="t-operators">${opsHTML}</div>
+    </div>
+    <div class="t-section">
+      <div class="t-sec-lbl">Medidas de Seguridad</div>
+      <div class="t-alert">
+        <div class="t-alert-title">⛔ Protocolo de Seguridad Activo</div>
+        <ul>
+          <li>Señalización con cartelería habilitada en todos los ingresos a los sectores afectados.</li>
+          <li>Control de presencia de Fosfina (PH₃) en el interior y medición de concentración en los encarpados.</li>
+          <li>Queda ESTRICTAMENTE PROHIBIDO circular o ingresar dentro del perímetro señalizado.</li>
+        </ul>
+        <div class="t-badge">⛔ Zona Restringida · No ingresar</div>
+      </div>
+    </div>
+    <div class="t-section">
+      <div class="t-sec-lbl">Cronograma</div>
+      <div class="t-timeline">
+        <div class="t-tl-item">
+          <div class="t-tl-dot a">🚀</div>
+          <div class="t-tl-content">
+            <div class="t-tl-date">${fmtDate(fi)} — ${hiFmt} hs</div>
+            <div class="t-tl-desc">Inicio de operaciones de fumigación. Sellado y señalización de sectores.</div>
+          </div>
+        </div>
+        <div class="t-tl-item">
+          <div class="t-tl-dot">🔒</div>
+          <div class="t-tl-content">
+            <div class="t-tl-date">${fl ? fmtDate(fl) : '—'}</div>
+            <div class="t-tl-desc">Fecha estimada de liberación de los sectores fumigados.</div>
+          </div>
+        </div>
+        <div class="t-tl-item">
+          <div class="t-tl-dot e">✅</div>
+          <div class="t-tl-content">
+            <div class="t-tl-date">${fr ? fmtDate(fr) : '—'} — ${hrFmt} hs</div>
+            <div class="t-tl-desc">Reinicio de actividades (previo a mediciones de concentración confirmadas). Acceso permitido solo tras habilitación técnica.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="t-section">
+      <div class="t-sec-lbl">Contactos ante Dudas o Emergencias</div>
+      <div class="t-contacts">${contactsHTML}</div>
+    </div>
+    <div class="t-footer">
+      <span class="t-footer-txt">Generado: ${fmtDate(new Date().toISOString().slice(0,10))} · ${tNum}</span>
+      <div class="t-status"><div class="t-status-dot"></div> Activo</div>
+    </div>
+  </div>`;
+
+  document.getElementById('previewArea').innerHTML = html;
+  document.getElementById('btnSend').disabled = false;
+  ticketGenerated = true;
+}
+
+// ==================== ENVIAR EMAIL ====================
+function sendEmail() {
+  if (emails.length === 0) { alert('Agregá al menos un destinatario.'); return; }
+
+  const fi  = document.getElementById('fechaInicio').value;
+  const hi  = document.getElementById('horaInicio').value;
+  const fl  = document.getElementById('fechaLiberacion').value;
+  const fr  = document.getElementById('fechaReinicio').value;
+  const hr  = document.getElementById('horaReinicio').value;
+  const tNum = getTicketNum();
+
+  const to = emails.map(e=>e.addr).join(',');
+  const subject = encodeURIComponent(`⚠️ ${tNum} | Aviso de Fumigación con Fosfuro de Aluminio — ${fmtDate(fi)}`);
+
+  const sectList = selectedSectors.map(s => `  - ${s}`).join('\n');
+
+  const body = encodeURIComponent(
+`Estimado/a equipo,
+
+Se informa que el día ${fmtDateLong(fi)}, a partir de las ${hi.slice(0,5)} hs, comenzarán las actividades de FUMIGACIÓN CON FOSFURO DE ALUMINIO en planta.
+
+TICKET: ${tNum}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTORES AFECTADOS:
+${sectList}
+
+PERSONAL A CARGO:
+  - Ezequiel Pereyra
+  - Franco Gutiérrez
+
+MEDIDAS DE SEGURIDAD:
+  ▶ Señalización con cartelería en todos los ingresos.
+  ▶ Control de presencia de Fosfina (PH₃) y medición de concentración.
+  ▶ PROHIBIDO circular o ingresar dentro del perímetro señalizado.
+
+CRONOGRAMA:
+  🚀 Inicio:     ${fmtDate(fi)} a las ${hi.slice(0,5)} hs
+  🔒 Liberación: ${fl ? fmtDate(fl) : '—'}
+  ✅ Reinicio:   ${fr ? fmtDate(fr) : '—'} a las ${hr.slice(0,5)} hs
+     (previo a mediciones de concentración confirmadas)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACTOS ANTE DUDAS O EMERGENCIAS:
+  📞 Pereyra Isaías Ezequiel: 358 514-5055
+  📞 Gutiérrez Franco:        358 487-4894
+  📞 Mayra Dip:               349 341-8445
+
+Se solicita comunicar esta información a TODO el personal.
+
+Saludos,
+Depto. Sanidad & Seguridad — Planta`
+  );
+
+  window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+
+  const toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+</script>
 </body>
 </html>
