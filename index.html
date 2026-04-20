@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ticket de Fumigación – 17/04/2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #f5f3ee;
+      --card: #ffffff;
+      --yellow: #f0c400;
+      --yellow-dark: #c49f00;
+      --black: #1a1a1a;
+      --gray: #4a4a4a;
+      --light-gray: #e8e5de;
+      --danger: #c0392b;
+      --danger-bg: #fdf2f1;
+      --green: #1a7a4a;
+      --green-bg: #edf7f1;
+      --border: #d6d0c4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: var(--black);
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* --- HEADER STRIP --- */
+    .header-strip {
+      background: var(--black);
+      color: var(--yellow);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .header-strip .org {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      color: #fff;
+    }
+
+    .header-strip .ticket-id {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+
+    /* --- MAIN CARD --- */
+    .card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      overflow: hidden;
+    }
+
+    /* --- TITLE BLOCK --- */
+    .title-block {
+      padding: 28px 28px 20px;
+      border-bottom: 2px solid var(--yellow);
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .hazard-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--yellow);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+      box-shadow: 3px 3px 0 var(--yellow-dark);
+    }
+
+    .title-text h1 {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--black);
+      line-height: 1.2;
+    }
+
+    .title-text h1 span {
+      color: var(--danger);
+    }
+
+    .title-text .subtitle {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 5px;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    /* --- META ROW --- */
+    .meta-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1.5px solid var(--light-gray);
+    }
+
+    .meta-item {
+      padding: 14px 20px;
+      border-right: 1.5px solid var(--light-gray);
+    }
+
+    .meta-item:last-child { border-right: none; }
+
+    .meta-item .label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 4px;
+    }
+
+    .meta-item .value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .meta-item .value.red { color: var(--danger); }
+    .meta-item .value.green { color: var(--green); }
+
+    /* --- BODY --- */
+    .body-section {
+      padding: 22px 28px;
+      border-bottom: 1.5px solid var(--light-gray);
+    }
+
+    .body-section:last-child { border-bottom: none; }
+
+    .section-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    /* Lead text */
+    .lead {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--black);
+    }
+
+    .lead strong {
+      font-weight: 700;
+      color: var(--danger);
+    }
+
+    /* Sectors grid */
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .sector-tag {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-left: 3px solid var(--yellow-dark);
+      padding: 8px 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--black);
+      border-radius: 2px;
+    }
+
+    /* Operators */
+    .operators-list {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .operator-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .operator-avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--black);
+      color: var(--yellow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .operator-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .operator-role {
+      font-size: 11px;
+      color: var(--gray);
+    }
+
+    /* Safety alert */
+    .alert-box {
+      background: var(--danger-bg);
+      border: 1.5px solid #e8b4b0;
+      border-left: 4px solid var(--danger);
+      border-radius: 3px;
+      padding: 14px 16px;
+    }
+
+    .alert-box .alert-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--danger);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .alert-box ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .alert-box ul li {
+      font-size: 13px;
+      color: #7a2020;
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .alert-box ul li::before {
+      content: "▶";
+      position: absolute;
+      left: 0;
+      font-size: 9px;
+      top: 3px;
+      color: var(--danger);
+    }
+
+    .prohibited-badge {
+      display: inline-block;
+      background: var(--danger);
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      margin-top: 8px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    /* Timeline */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 28px;
+      bottom: -4px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .timeline-item:last-child::before { display: none; }
+
+    .tl-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tl-dot.active {
+      background: var(--yellow);
+      border-color: var(--yellow-dark);
+    }
+
+    .tl-dot.end {
+      background: var(--green-bg);
+      border-color: var(--green);
+    }
+
+    .tl-content {
+      padding: 4px 0 20px;
+    }
+
+    .tl-date {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .tl-desc {
+      font-size: 12.5px;
+      color: var(--gray);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    /* Contacts */
+    .contacts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 3px;
+    }
+
+    .contact-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .contact-phone {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--gray);
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* --- FOOTER --- */
+    .footer {
+      background: var(--bg);
+      border-top: 1.5px solid var(--border);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer .generated {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--gray);
+      letter-spacing: 1px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff3cd;
+      border: 1px solid #f0c400;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: #7a5c00;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--yellow-dark);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @media (max-width: 480px) {
+      .meta-row { grid-template-columns: 1fr 1fr; }
+      .meta-item:nth-child(3) { grid-column: 1 / -1; border-right: none; border-top: 1.5px solid var(--light-gray); }
+      .sectors-grid { grid-template-columns: 1fr; }
+      .operators-list { flex-direction: column; }
+      .header-strip { flex-direction: column; gap: 4px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER STRIP -->
+  <div class="header-strip">
+    <span class="org">⚙ Planta — Depto. Sanidad & Seguridad</span>
+    <span class="ticket-id">#FUM-2604-001</span>
+  </div>
+
+  <div class="card">
+
+    <!-- TITLE BLOCK -->
+    <div class="title-block">
+      <div class="hazard-icon">⚠️</div>
+      <div class="title-text">
+        <h1>Aviso de <span>Fumigación</span><br>con Fosfuro de Aluminio</h1>
+        <p class="subtitle">Notificación oficial · Requiere difusión inmediata a todo el personal</p>
+      </div>
+    </div>
+
+    <!-- META ROW -->
+    <div class="meta-row">
+      <div class="meta-item">
+        <div class="label">Fecha de Inicio</div>
+        <div class="value">17/04/2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Hora de Inicio</div>
+        <div class="value red">15:45 hs</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Estado</div>
+        <div class="value red">⚠ En curso</div>
+      </div>
+    </div>
+
+    <!-- INTRO -->
+    <div class="body-section">
+      <div class="section-title">Descripción de la Operación</div>
+      <p class="lead">
+        El día <strong>viernes 17 de abril de 2026</strong>, a partir de las <strong>15:45 hs</strong>, 
+        se darán inicio a las actividades de <strong>fumigación con Fosfuro de Aluminio (PH₃)</strong> 
+        en los sectores listados a continuación. Se solicita la difusión inmediata de esta comunicación 
+        a todo el personal de planta.
+      </p>
+    </div>
+
+    <!-- SECTORES -->
+    <div class="body-section">
+      <div class="section-title">Sectores Afectados</div>
+      <div class="sectors-grid">
+        <div class="sector-tag">📦 Depósito D1</div>
+        <div class="sector-tag">📦 Depósito D2</div>
+        <div class="sector-tag">📦 Depósito D3</div>
+        <div class="sector-tag">🏭 Pulmón Blanch</div>
+        <div class="sector-tag">🏭 Pulmón HPS1</div>
+        <div class="sector-tag">🗄 Depósito de Insumos</div>
+      </div>
+    </div>
+
+    <!-- OPERARIOS -->
+    <div class="body-section">
+      <div class="section-title">Personal a Cargo</div>
+      <div class="operators-list">
+        <div class="operator-card">
+          <div class="operator-avatar">EP</div>
+          <div>
+            <div class="operator-name">Ezequiel Pereyra</div>
+            <div class="operator-role">Operario Fumigador</div>
+          </div>
+        </div>
+        <div class="operator-card">
+          <div class="operator-avatar">FG</div>
+          <div>
+            <div class="operator-name">Franco Gutiérrez</div>
+            <div class="operator-role">Operario Fumigador</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEGURIDAD -->
+    <div class="body-section">
+      <div class="section-title">Medidas de Seguridad</div>
+      <div class="alert-box">
+        <div class="alert-title">⛔ Protocolo de Seguridad Activo</div>
+        <ul>
+          <li>Señalización con cartelería habilitada en todos los ingresos a los sectores afectados.</li>
+          <li>Control de presencia de Fosfina (PH₃) en el interior de los locales y medición de concentración en los encarpados.</li>
+          <li>Queda <strong>ESTRICTAMENTE PROHIBIDO</strong> circular o ingresar dentro del perímetro señalizado.</li>
+        </ul>
+        <div class="prohibited-badge">⛔ Zona Restringida · No ingresar</div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="body-section">
+      <div class="section-title">Cronograma</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="tl-dot active">🚀</div>
+          <div class="tl-content">
+            <div class="tl-date">Vie 17/04/2026 — 15:45 hs</div>
+            <div class="tl-desc">Inicio de operaciones de fumigación. Sellado y señalización de sectores.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot">🔒</div>
+          <div class="tl-content">
+            <div class="tl-date">Vie 24/04/2026</div>
+            <div class="tl-desc">Fecha estimada de liberación de los sectores fumigados.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot end">✅</div>
+          <div class="tl-content">
+            <div class="tl-date">Lun 27/04/2026 — 6:00 hs</div>
+            <div class="tl-desc">Reinicio de actividades (previo a mediciones de concentración confirmadas). Acceso permitido solo tras habilitación técnica.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACTOS -->
+    <div class="body-section">
+      <div class="section-title">Contactos ante Dudas o Emergencias</div>
+      <div class="contacts-list">
+        <div class="contact-row">
+          <div>
+            <div class="contact-name">Pereyra Isaías Ezequiel</div>
+            <div style="font-size:11px;color:var(--gray)">Responsable Técnico</div>
+          </div>
+          <div class="contact-phone">📞 358 514-5055</div>
+        </div>
+        <div class="contact-row">
+          <div>
+            <div class="contact-name">Gutiérrez Franco</div>
+            <div style="font-size:11px;color:var(--gray)">Operario a Cargo</div>
+          </div>
+          <div class="contact-phone">📞 358 487-4894</div>
+        </div>
+        <div class="contact-row">
+          <div>
+            <div class="contact-name">Mayra Dip</div>
+            <div style="font-size:11px;color:var(--gray)">Coordinación</div>
+          </div>
+          <div class="contact-phone">📞 349 341-8445</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span class="generated">Generado: 17/04/2026 · #FUM-2604-001</span>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      Activo
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
