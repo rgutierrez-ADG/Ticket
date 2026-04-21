@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>App Fumigacion - Maniagro</title>
+<title>App Fumigación - Maniagro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --bg:#f0f2f5; --surface:#fff; --surface2:#f8f9fa;
@@ -158,13 +160,13 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
     <img src="data:image/jpeg;base64,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" alt="Maniagro" style="height:48px;width:auto;border-radius:3px;"/>
     <div>
       <div class="app-title">Generador de Tickets</div>
-      <div class="app-sub">Fumigacion con Fosfuro de Aluminio</div>
+      <div class="app-sub">Fumigación con Fosfuro de Aluminio</div>
     </div>
   </div>
 
   <!-- TICKET NUM -->
   <div class="form-section">
-    <div class="sec-lbl">Identificacion</div>
+    <div class="sec-lbl">Identificación</div>
     <div class="form-group">
       <label class="f-lbl">Numero de Ticket</label>
       <div class="tnum-box">
@@ -211,17 +213,17 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
           <button class="dd-act" onclick="clrAll('sPanel'); updSectors()">NINGUNO</button>
         </div>
       </div>
-      <div class="chips" id="sChips"><span class="chip-none">Ningun sector seleccionado</span></div>
+      <div class="chips" id="sChips"><span class="chip-none">Ningún sector seleccionado</span></div>
     </div>
   </div>
 
   <!-- PRODUCTO LOTE QUIMICO -->
   <div class="form-section">
-    <div class="sec-lbl">Producto, Lote y Quimico</div>
+    <div class="sec-lbl">Producto, Lote y Químico</div>
     <div class="two-col">
       <div class="form-group">
         <label class="f-lbl">Tipo/s de producto</label>
-        <input class="f-inp" type="text" id="producto" placeholder="Ej: Mani, Poroto, Maiz"/>
+        <input class="f-inp" type="text" id="producto" placeholder="Ej: Maní, Poroto, Maíz"/>
       </div>
       <div class="form-group">
         <label class="f-lbl">Lote/s</label>
@@ -229,7 +231,7 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
       </div>
     </div>
     <div class="form-group">
-      <label class="f-lbl">Quimico/s utilizado/s</label>
+      <label class="f-lbl">Químico/s utilizado/s</label>
       <input class="f-inp" type="text" id="quimico" placeholder="Ej: Fosfuro de Aluminio, Bifentrina"/>
     </div>
   </div>
@@ -238,7 +240,7 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
   <div class="form-section">
     <div class="sec-lbl">Cronograma</div>
     <div class="two-col">
-      <div class="form-group"><label class="f-lbl">Fecha de liberacion</label><input class="f-inp" type="date" id="fl"/></div>
+      <div class="form-group"><label class="f-lbl">Fecha de liberación</label><input class="f-inp" type="date" id="fl"/></div>
       <div class="form-group"><label class="f-lbl">Fecha reinicio actividades</label><input class="f-inp" type="date" id="fr"/></div>
     </div>
     <div class="form-group"><label class="f-lbl">Hora reinicio actividades</label><input class="f-inp" type="time" id="hr" value="06:00"/></div>
@@ -279,7 +281,7 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
         <button class="dd-act" onclick="clrAll('ePanel'); updEmails()">NINGUNO</button>
       </div>
     </div>
-    <div class="chips" id="eChips"><span class="chip-none">Ningun destinatario seleccionado</span></div>
+    <div class="chips" id="eChips"><span class="chip-none">Ningún destinatario seleccionado</span></div>
     <div class="add-row">
       <input class="f-inp" type="text" id="newName" placeholder="Nombre adicional"/>
       <input class="f-inp" type="email" id="newAddr" placeholder="email@empresa.com"/>
@@ -313,7 +315,7 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
   <div id="previewArea">
     <div class="empty-state">
       <div class="empty-icon">&#128194;</div>
-      <p>Completa el formulario<br>y genera el ticket</p>
+      <p>Completá el formulario<br>y generá el ticket</p>
     </div>
   </div>
 </div>
@@ -430,7 +432,7 @@ function updSectors() {
   document.querySelectorAll('#sPanel input:checked').forEach(function(c){ selSectors.push(c.value); });
   var wrap = document.getElementById('sChips');
   if (!selSectors.length) {
-    wrap.innerHTML = '<span class="chip-none">Ningun sector seleccionado</span>';
+    wrap.innerHTML = '<span class="chip-none">Ningún sector seleccionado</span>';
   } else {
     wrap.innerHTML = selSectors.map(function(s) {
       return '<div class="chip">' + s + '<button class="chip-x" onclick="unchkS(\'' + s.replace(/'/g, "\\'") + '\')">&#215;</button></div>';
@@ -459,7 +461,7 @@ function renderEChips() {
   var wrap = document.getElementById('eChips');
   var all  = selEmails.concat(extraEmails);
   if (!all.length) {
-    wrap.innerHTML = '<span class="chip-none">Ningun destinatario seleccionado</span>';
+    wrap.innerHTML = '<span class="chip-none">Ningún destinatario seleccionado</span>';
   } else {
     wrap.innerHTML =
       selEmails.map(function(e,i) {
@@ -482,7 +484,7 @@ function unchkE(i) {
 function addExtra() {
   var n = document.getElementById('newName').value.trim();
   var a = document.getElementById('newAddr').value.trim();
-  if (!a.includes('@')) { alert('Ingresa un email valido.'); return; }
+  if (!a.includes('@')) { alert('Ingresá un email válido.'); return; }
   extraEmails.push({n:n||a, a:a});
   document.getElementById('newName').value = '';
   document.getElementById('newAddr').value = '';
@@ -494,7 +496,7 @@ function allEmails() { return selEmails.concat(extraEmails); }
 // DATE HELPERS
 function fmtD(s) {
   if (!s) return '-';
-  var p=s.split('-'), dias=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+  var p=s.split('-'), dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   return dias[new Date(p[0],p[1]-1,p[2]).getDay()] + ' ' + p[2]+'/'+p[1]+'/'+p[0];
 }
 function fmtL(s) {
@@ -515,8 +517,8 @@ function genTicket() {
   var lot = document.getElementById('lotes').value.trim();
   var qim = document.getElementById('quimico').value.trim();
 
-  if (!fi||!hi) { alert('Completa la fecha y hora de inicio.'); return; }
-  if (!selSectors.length) { alert('Selecciona al menos un sector.'); return; }
+  if (!fi||!hi) { alert('Completá la fecha y hora de inicio.'); return; }
+  if (!selSectors.length) { alert('Seleccioná al menos un sector.'); return; }
 
   var tNum = getNum();
   var hf   = hi.slice(0,5);
@@ -528,10 +530,10 @@ function genTicket() {
   // Producto / Lote / Quimico block
   var pBlock = '';
   if (prd || lot || qim) {
-    pBlock = '<div class="t-sec"><div class="t-sl">Producto, Lote y Quimico</div><div class="t-grid2">';
+    pBlock = '<div class="t-sec"><div class="t-sl">Producto, Lote y Químico</div><div class="t-grid2">';
     if (prd) pBlock += '<div class="t-card"><span class="t-card-lbl">Tipo/s de Producto</span><span class="t-card-val">'+prd+'</span></div>';
     if (lot) pBlock += '<div class="t-card"><span class="t-card-lbl">Lote/s</span><span class="t-card-val">'+lot+'</span></div>';
-    if (qim) pBlock += '<div class="t-card" style="border-left-color:#1a8a4a"><span class="t-card-lbl">Quimico/s Utilizado/s</span><span class="t-card-val">'+qim+'</span></div>';
+    if (qim) pBlock += '<div class="t-card" style="border-left-color:#1a8a4a"><span class="t-card-lbl">Químico/s Utilizado/s</span><span class="t-card-val">'+qim+'</span></div>';
     pBlock += '</div></div>';
   }
 
@@ -550,14 +552,14 @@ function genTicket() {
   var html =
     '<div class="ticket">' +
     '<div class="t-hdr"><img src="data:image/jpeg;base64,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" alt="Maniagro" style="height:32px;width:auto;border-radius:2px;"/><span class="t-id">'+tNum+'</span></div>' +
-    '<div class="t-ttl"><div class="t-icon">&#9888;&#65039;</div><div class="t-ttl-txt"><h2>AVISO DE FUMIGACION</h2><p>Notificacion oficial &middot; Difusion inmediata a todo el personal</p></div></div>' +
+    '<div class="t-ttl"><div class="t-icon">&#9888;&#65039;</div><div class="t-ttl-txt"><h2>AVISO DE FUMIGACIÓN</h2><p>Notificación oficial &middot; Difusión inmediata a todo el personal</p></div></div>' +
     '<div class="t-meta">' +
       '<div class="t-mi"><div class="t-ml">Fecha</div><div class="t-mv">'+fmtD(fi)+'</div></div>' +
       '<div class="t-mi"><div class="t-ml">Hora</div><div class="t-mv red">'+hf+' hs</div></div>' +
       '<div class="t-mi"><div class="t-ml">Estado</div><div class="t-mv red">&#9888; Activo</div></div>' +
     '</div>' +
-    '<div class="t-sec"><div class="t-sl">Descripcion de la Operacion</div>' +
-      '<p class="t-desc">El dia <strong>'+fmtL(fi)+'</strong>, a partir de las <strong>'+hf+' hs</strong>, se daran inicio las actividades de <strong>fumigacion</strong> en los sectores indicados. Se solicita difusion inmediata a todo el personal.</p>' +
+    '<div class="t-sec"><div class="t-sl">Descripción de la Operación</div>' +
+      '<p class="t-desc">El día <strong>'+fmtL(fi)+'</strong>, a partir de las <strong>'+hf+' hs</strong>, se darán inicio las actividades de <strong>fumigación</strong> en los sectores indicados. Se solicita difusión inmediata a todo el personal.</p>' +
     '</div>' +
     '<div class="t-sec"><div class="t-sl">Sectores Afectados</div><div class="t-sectors">'+sectH+'</div></div>' +
     pBlock +
@@ -565,17 +567,17 @@ function genTicket() {
     '<div class="t-sec"><div class="t-sl">Medidas de Seguridad</div>' +
       '<div class="t-alert"><div class="t-at">&#9940; Protocolo de Seguridad Activo</div>' +
         '<ul>' +
-          '<li>Senalizacion con carteleria en todos los ingresos a los sectores afectados.</li>' +
-          '<li>Control de presencia de Fosfina (PH3) en el interior y medicion de concentracion en los encarpados.</li>' +
-          '<li>Queda ESTRICTAMENTE PROHIBIDO circular o ingresar dentro del perimetro senalizado.</li>' +
-          '<li>En la Porteria N&deg; 1 y N&deg; 2 se dejaran las hojas de datos de seguridad.</li>' +
+          '<li>Señalización con cartelería en todos los ingresos a los sectores afectados.</li>' +
+          '<li>Control de presencia de Fosfina (PH3) en el interior y medición de concentración en los encarpados.</li>' +
+          '<li>Queda ESTRICTAMENTE PROHIBIDO circular o ingresar dentro del perímetro señalizado.</li>' +
+          '<li>En la Portería N.&deg; 1 y N.&deg; 2 se dejarán las hojas de datos de seguridad.</li>' +
         '</ul>' +
         '<div class="t-badge">&#9940; Zona Restringida &middot; No ingresar</div>' +
       '</div>' +
     '</div>' +
     '<div class="t-sec"><div class="t-sl">Cronograma</div><div class="t-tl">' +
-      '<div class="t-tli"><div class="t-dot a">&#128640;</div><div class="t-tlc"><div class="t-tld">'+fmtD(fi)+' - '+hf+' hs</div><div class="t-tlds">Inicio de fumigacion. Sellado y senalizacion de sectores.</div></div></div>' +
-      '<div class="t-tli"><div class="t-dot">&#128274;</div><div class="t-tlc"><div class="t-tld">'+(fl?fmtD(fl):'-')+'</div><div class="t-tlds">Liberacion de los sectores fumigados.</div></div></div>' +
+      '<div class="t-tli"><div class="t-dot a">&#128640;</div><div class="t-tlc"><div class="t-tld">'+fmtD(fi)+' - '+hf+' hs</div><div class="t-tlds">Inicio de fumigación. Sellado y señalización de sectores.</div></div></div>' +
+      '<div class="t-tli"><div class="t-dot">&#128274;</div><div class="t-tlc"><div class="t-tld">'+(fl?fmtD(fl):'-')+'</div><div class="t-tlds">Liberación de los sectores fumigados.</div></div></div>' +
       '<div class="t-tli"><div class="t-dot e">&#9989;</div><div class="t-tlc"><div class="t-tld">'+(fr?fmtD(fr):'-')+' - '+hrf+' hs</div><div class="t-tlds">Reinicio de actividades (previo a mediciones confirmadas).</div></div></div>' +
     '</div></div>' +
     '<div class="t-sec"><div class="t-sl">Contactos ante Dudas o Emergencias</div><div class="t-cts">'+ctsH+'</div></div>' +
@@ -598,10 +600,10 @@ function showToast(msg, col) {
 }
 
 // SEND GMAIL - Descarga PDF y abre Gmail con destinatarios + asunto + cuerpo
-function sendGmail() {
-  if (!ticketOK) { alert('Primero genera el ticket.'); return; }
+async function sendGmail() {
+  if (!ticketOK) { alert('Primero generá el ticket.'); return; }
   var all = allEmails();
-  if (!all.length) { alert('Selecciona al menos un destinatario.'); return; }
+  if (!all.length) { alert('Seleccioná al menos un destinatario.'); return; }
 
   var fi  = document.getElementById('fi').value;
   var hi  = document.getElementById('hi').value;
@@ -623,12 +625,12 @@ function sendGmail() {
   var prodLines = '';
   if (prd) prodLines += '\nTIPO/S DE PRODUCTO: ' + prd;
   if (lot) prodLines += '\nLOTE/S:             ' + lot;
-  if (qim) prodLines += '\nQUIMICO/S:          ' + qim;
+  if (qim) prodLines += '\nQUÍMICO/S:          ' + qim;
 
   var body = [
     'Estimado/a equipo,',
     '',
-    'Se informa que el dia ' + fmtL(fi) + ', a partir de las ' + hf + ' hs, comenzaran las actividades de FUMIGACION en planta.',
+    'Se informa que el día ' + fmtL(fi) + ', a partir de las ' + hf + ' hs, comenzarán las actividades de FUMIGACIÓN en planta.',
     '',
     'TICKET: ' + tNum,
     '(Se adjunta PDF con el detalle completo)',
@@ -642,16 +644,16 @@ function sendGmail() {
     '  - Franco Gutierrez',
     '',
     'MEDIDAS DE SEGURIDAD:',
-    '  - Senalizacion con carteleria en todos los ingresos.',
-    '  - Control de presencia de Fosfina (PH3) y medicion de concentracion.',
-    '  - PROHIBIDO circular o ingresar dentro del perimetro senalizado.',
-    '  - En la Porteria N 1 y N 2 se dejaran las hojas de datos de seguridad.',
+    '  - Señalización con cartelería en todos los ingresos.',
+    '  - Control de presencia de Fosfina (PH3) y medición de concentración.',
+    '  - PROHIBIDO circular o ingresar dentro del perímetro señalizado.',
+    '  - En la Portería N.° 1 y N.° 2 se dejarán las hojas de datos de seguridad.',
     '',
     'CRONOGRAMA:',
     '  Inicio:     ' + fmtD(fi) + ' a las ' + hf + ' hs',
-    '  Liberacion: ' + (fl ? fmtD(fl) : '-'),
+    '  Liberación: ' + (fl ? fmtD(fl) : '-'),
     '  Reinicio:   ' + (fr ? fmtD(fr) : '-') + ' a las ' + hrf + ' hs',
-    '  (previo a mediciones de concentracion confirmadas)',
+    '  (previo a mediciones de concentración confirmadas)',
     '',
     '--------------------------------------------',
     'CONTACTOS:',
@@ -665,11 +667,11 @@ function sendGmail() {
     'Depto. Sanidad & Seguridad - Maniagro Argentina'
   ].join('\n');
 
-  var subject = tNum + ' | Aviso de Fumigacion - ' + fmtD(fi);
+  var subject = tNum + ' | Aviso de Fumigación - ' + fmtD(fi);
   var toList  = all.map(function(e){ return e.a; }).join(',');
 
-  // 1) Disparar descarga del PDF (ticket.html -> el usuario hace "Guardar como PDF")
-  dlPDF();
+  // 1) Generar y descargar el PDF primero (await para que no se superponga con la apertura de Gmail)
+  await dlPDF();
 
   // 2) Construir URL de Gmail compose con la cuenta remitente elegida
   //    authuser=<email> le indica a Gmail cual de las cuentas logueadas usar
@@ -679,38 +681,100 @@ function sendGmail() {
     + '&su='       + encodeURIComponent(subject)
     + '&body='     + encodeURIComponent(body);
 
-  // 3) Abrir Gmail en pestana nueva (pequeno delay para que la descarga arranque primero)
-  showToast('Descargando PDF y abriendo Gmail (' + fromAcc + ')...', '#1a8a4a');
+  // 3) Abrir Gmail en pestana nueva
+  showToast('Abriendo Gmail (' + fromAcc + ')…', '#1a8a4a');
   setTimeout(function(){
     var w = window.open(gmailURL, '_blank');
     if (!w) {
-      alert('El navegador bloqueo la ventana emergente. Permiti pop-ups para este sitio e intenta de nuevo.');
+      alert('El navegador bloqueó la ventana emergente. Permití pop-ups para este sitio e intentá de nuevo.');
     }
-  }, 600);
+  }, 300);
 }
 
-// PDF - uses blob to avoid any string escaping issues
-function dlPDF() {
-  if (!ticketOK) { alert('Primero genera el ticket.'); return; }
+// PDF - genera PDF real con jsPDF + html2canvas (sin headers/footers del navegador)
+// Retorna una Promise para poder encadenar con sendGmail()
+async function dlPDF() {
+  if (!ticketOK) { alert('Primero generá el ticket.'); return; }
   var ticket = document.getElementById('previewArea').querySelector('.ticket');
-  if (!ticket) { alert('No se encontro el ticket.'); return; }
+  if (!ticket) { alert('No se encontró el ticket.'); return; }
 
-  var ticketHTML = ticket.outerHTML;
-  var css = document.querySelector('style').textContent;
+  var btnPDF  = document.getElementById('btnPDF');
+  var btnSend = document.getElementById('btnSend');
+  var prevTxt = btnPDF.innerHTML;
+  btnPDF.disabled  = true;
+  btnSend.disabled = true;
+  btnPDF.innerHTML = 'Generando PDF…';
 
-  var fullHTML = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>'
-    + '<title>Ticket Fumigacion</title>'
-    + '<style>' + css + '.no-print{text-align:center;margin:20px auto;max-width:680px;} @media print{.no-print{display:none;} body{padding:0;background:#fff;}}</style>'
-    + '</head><body style="background:#f5f3ee;font-family:Arial,sans-serif;padding:30px;">'
-    + '<div style="max-width:680px;margin:0 auto;">' + ticketHTML + '</div>'
-    + '<div class="no-print"><button onclick="window.print()" style="margin-top:16px;padding:10px 28px;background:#1a1a1a;color:#f0c400;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;">Imprimir / Guardar PDF</button></div>'
-    + '</body></html>';
+  try {
+    // 1) Clonar el ticket a un contenedor offscreen con ancho fijo y fondo blanco
+    //    (evita problemas de escalado y fondos translúcidos)
+    var holder = document.createElement('div');
+    holder.style.cssText = 'position:fixed;left:-10000px;top:0;width:800px;background:#ffffff;padding:20px;font-family:Arial,sans-serif;';
+    var clone = ticket.cloneNode(true);
+    clone.style.maxWidth = '760px';
+    clone.style.margin   = '0 auto';
+    holder.appendChild(clone);
+    document.body.appendChild(holder);
 
-  var blob = new Blob([fullHTML], { type: 'text/html' });
-  var url  = URL.createObjectURL(blob);
-  var win  = window.open(url, '_blank');
-  if (!win) { alert('El navegador bloqueo la ventana. Permitilo e intenta de nuevo.'); return; }
-  win.onload = function() { setTimeout(function(){ try{ win.print(); }catch(e){} }, 800); };
+    // 2) Rasterizar con html2canvas a alta resolución (scale 2 = retina)
+    var canvas = await html2canvas(holder, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    });
+    document.body.removeChild(holder);
+
+    // 3) Crear PDF A4 retrato (mm)
+    var jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+    var pdf = new jsPDFCtor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    var pageW = pdf.internal.pageSize.getWidth();   // 210
+    var pageH = pdf.internal.pageSize.getHeight();  // 297
+    var margin = 10; // mm
+    var imgW = pageW - margin * 2;
+    var imgH = canvas.height * imgW / canvas.width;
+
+    var imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+    // 4) Si el ticket excede una página, partir en varias páginas preservando proporción
+    if (imgH <= pageH - margin * 2) {
+      pdf.addImage(imgData, 'JPEG', margin, margin, imgW, imgH);
+    } else {
+      // Dividir en páginas
+      var pageContentH = pageH - margin * 2; // alto útil por página en mm
+      var sliceHpx = Math.floor(canvas.width * pageContentH / imgW); // alto por página en px del canvas
+      var yOffsetPx = 0;
+      while (yOffsetPx < canvas.height) {
+        var sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width  = canvas.width;
+        sliceCanvas.height = Math.min(sliceHpx, canvas.height - yOffsetPx);
+        var ctx = sliceCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+        ctx.drawImage(canvas, 0, yOffsetPx, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+        var sliceData = sliceCanvas.toDataURL('image/jpeg', 0.92);
+        var sliceImgH = sliceCanvas.height * imgW / sliceCanvas.width;
+        if (yOffsetPx > 0) pdf.addPage();
+        pdf.addImage(sliceData, 'JPEG', margin, margin, imgW, sliceImgH);
+        yOffsetPx += sliceHpx;
+      }
+    }
+
+    // 5) Guardar archivo con nombre del ticket
+    var tNum = getNum().replace('#', '');
+    var fi   = document.getElementById('fi').value;
+    var filename = 'Ticket_Fumigacion_' + tNum + '_' + fi + '.pdf';
+    pdf.save(filename);
+
+    showToast('PDF descargado: ' + filename, '#1a8a4a');
+  } catch(err) {
+    console.error('Error generando PDF:', err);
+    alert('Error al generar el PDF: ' + err.message);
+  } finally {
+    btnPDF.disabled  = false;
+    btnSend.disabled = false;
+    btnPDF.innerHTML = prevTxt;
+  }
 }
 </script>
 </body>
