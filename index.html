@@ -304,6 +304,10 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
   <button class="btn-gen"  onclick="genTicket()">&#9881; Generar Vista Previa</button>
   <button class="btn-send" id="btnSend" onclick="sendGmail()" disabled>&#9993; Descargar PDF y Abrir Gmail</button>
   <button class="btn-pdf"  id="btnPDF"  onclick="dlPDF()"    disabled>&#11015; Solo Descargar PDF</button>
+  <div style="margin-top:8px;font-size:10px;color:var(--text3);line-height:1.5;text-align:center;">
+    Al enviar: el PDF se descarga, el cuerpo del mail se copia al portapapeles con formato y se abre Gmail.<br>
+    En Gmail, hacé <b>Ctrl+V</b> en el cuerpo del mensaje para pegar con formato, y adjuntá el PDF descargado.
+  </div>
 </div>
 
 <!-- PANEL PREVIEW -->
@@ -627,7 +631,8 @@ async function sendGmail() {
   if (lot) prodLines += '\nLOTE/S:             ' + lot;
   if (qim) prodLines += '\nQUÍMICO/S:          ' + qim;
 
-  var body = [
+  // Body TEXTO PLANO (fallback para Gmail URL)
+  var bodyPlain = [
     'Estimado/a equipo,',
     '',
     'Se informa que el día ' + fmtL(fi) + ', a partir de las ' + hf + ' hs, comenzarán las actividades de FUMIGACIÓN en planta.',
@@ -667,28 +672,135 @@ async function sendGmail() {
     'Depto. Sanidad & Seguridad - Maniagro Argentina'
   ].join('\n');
 
+  // Body HTML (rich text) para pegar en Gmail con Ctrl+V
+  // Colores y negritas replicando el formato de la plantilla oficial
+  var RED  = '#c0392b';
+  var DARK = '#1a1e26';
+  var sectHTML = selSectors.map(function(s){ return '&nbsp;&nbsp;- ' + escHTML(s); }).join('<br>');
+  var prodHTML = '';
+  if (prd) prodHTML += '<b>TIPO/S DE PRODUCTO:</b> ' + escHTML(prd) + '<br>';
+  if (lot) prodHTML += '<b>LOTE/S:</b> ' + escHTML(lot) + '<br>';
+  if (qim) prodHTML += '<b>QUÍMICO/S:</b> ' + escHTML(qim) + '<br>';
+
+  var bodyHTML =
+    '<div style="font-family:Arial,sans-serif;font-size:13px;color:' + DARK + ';line-height:1.55;">' +
+      '<p style="margin:0 0 10px 0;"><b>Estimado/a equipo</b>,</p>' +
+      '<p style="margin:0 0 10px 0;">Se informa que el día <b style="color:' + RED + ';">' + fmtL(fi) + '</b>, a partir de las <b style="color:' + RED + ';">' + hf + ' hs</b>, comenzarán las actividades de <b style="color:' + RED + ';">FUMIGACIÓN</b> en planta.</p>' +
+      '<p style="margin:0 0 4px 0;">TICKET: ' + escHTML(tNum) + '</p>' +
+      '<p style="margin:0 0 10px 0;color:#666;font-size:12px;">(Se adjunta PDF con el detalle completo)</p>' +
+      '<hr style="border:none;border-top:1px solid #ccc;margin:12px 0;">' +
+      '<p style="margin:0 0 6px 0;"><b>SECTORES AFECTADOS:</b></p>' +
+      '<p style="margin:0 0 10px 0;">' + sectHTML + '</p>' +
+      (prodHTML ? '<p style="margin:0 0 10px 0;">' + prodHTML + '</p>' : '') +
+      '<p style="margin:0 0 6px 0;"><b>PERSONAL A CARGO:</b></p>' +
+      '<p style="margin:0 0 10px 0;">&nbsp;&nbsp;- Ezequiel Pereyra<br>&nbsp;&nbsp;- Franco Gutierrez</p>' +
+      '<p style="margin:0 0 6px 0;"><b>MEDIDAS DE SEGURIDAD:</b></p>' +
+      '<ul style="margin:0 0 10px 0;padding-left:22px;">' +
+        '<li>Señalización con cartelería en todos los ingresos.</li>' +
+        '<li>Control de presencia de Fosfina (PH3) y medición de concentración.</li>' +
+        '<li><b style="color:' + RED + ';">PROHIBIDO circular o ingresar dentro del perímetro señalizado.</b></li>' +
+        '<li>En la Portería N.° 1 y N.° 2 se dejarán las hojas de datos de seguridad.</li>' +
+      '</ul>' +
+      '<p style="margin:0 0 6px 0;"><b>CRONOGRAMA:</b></p>' +
+      '<p style="margin:0 0 10px 0;font-family:Consolas,Monaco,monospace;font-size:12px;">' +
+        '&nbsp;&nbsp;Inicio:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + fmtD(fi) + ' a las ' + hf + ' hs<br>' +
+        '&nbsp;&nbsp;Liberación:&nbsp;&nbsp;' + (fl ? fmtD(fl) : '-') + '<br>' +
+        '&nbsp;&nbsp;Reinicio:&nbsp;&nbsp;&nbsp;&nbsp;' + (fr ? fmtD(fr) : '-') + ' a las ' + hrf + ' hs<br>' +
+        '&nbsp;&nbsp;<span style="color:#666;">(previo a mediciones de concentración confirmadas)</span>' +
+      '</p>' +
+      '<hr style="border:none;border-top:1px solid #ccc;margin:12px 0;">' +
+      '<p style="margin:0 0 6px 0;"><b>CONTACTOS:</b></p>' +
+      '<p style="margin:0 0 10px 0;">' +
+        '&nbsp;&nbsp;Pereyra Isaias Ezequiel: 358 514-5055<br>' +
+        '&nbsp;&nbsp;Gutierrez Franco:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;358 487-4894<br>' +
+        '&nbsp;&nbsp;Mayra Dip:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;349 341-8445' +
+      '</p>' +
+      '<p style="margin:0 0 10px 0;"><b>Se solicita comunicar a <span style="color:' + RED + ';">TODO</span> el personal.</b></p>' +
+      '<p style="margin:0;">Saludos,<br><span style="color:#666;font-size:12px;">Depto. Sanidad &amp; Seguridad - Maniagro Argentina</span></p>' +
+    '</div>';
+
   var subject = tNum + ' | Aviso de Fumigación - ' + fmtD(fi);
   var toList  = all.map(function(e){ return e.a; }).join(',');
 
-  // 1) Generar y descargar el PDF primero (await para que no se superponga con la apertura de Gmail)
+  // 1) Generar y descargar el PDF primero
   await dlPDF();
 
-  // 2) Construir URL de Gmail compose con la cuenta remitente elegida
+  // 2) Copiar HTML al portapapeles (rich text) para que el usuario pegue con Ctrl+V en Gmail
+  var copyOK = await copyRichTextToClipboard(bodyHTML, bodyPlain);
+
+  // 3) Construir URL de Gmail compose con la cuenta remitente elegida
   //    authuser=<email> le indica a Gmail cual de las cuentas logueadas usar
+  //    Dejamos el body VACIO a propósito: el usuario pega con Ctrl+V el rich text
   var gmailURL = 'https://mail.google.com/mail/?view=cm&fs=1'
     + '&authuser=' + encodeURIComponent(fromAcc)
     + '&to='       + encodeURIComponent(toList)
-    + '&su='       + encodeURIComponent(subject)
-    + '&body='     + encodeURIComponent(body);
+    + '&su='       + encodeURIComponent(subject);
 
-  // 3) Abrir Gmail en pestana nueva
-  showToast('Abriendo Gmail (' + fromAcc + ')…', '#1a8a4a');
+  // Si no se pudo copiar al clipboard, incluir body como texto plano (fallback)
+  if (!copyOK) {
+    gmailURL += '&body=' + encodeURIComponent(bodyPlain);
+  }
+
+  // 4) Abrir Gmail en pestana nueva
+  var msg = copyOK
+    ? 'PDF descargado. Gmail abierto. Pegá el cuerpo con Ctrl+V'
+    : 'PDF descargado. Gmail abierto (formato texto plano).';
+  showToast(msg, '#1a8a4a');
   setTimeout(function(){
     var w = window.open(gmailURL, '_blank');
     if (!w) {
       alert('El navegador bloqueó la ventana emergente. Permití pop-ups para este sitio e intentá de nuevo.');
     }
   }, 300);
+}
+
+// Escape HTML para texto del usuario (sectores, productos, etc.)
+function escHTML(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Copia contenido HTML al portapapeles como rich text
+// Fallback: texto plano si la API de clipboard no está disponible o falla
+async function copyRichTextToClipboard(html, plain) {
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      var htmlBlob  = new Blob([html],  { type: 'text/html'  });
+      var plainBlob = new Blob([plain], { type: 'text/plain' });
+      var item = new ClipboardItem({
+        'text/html':  htmlBlob,
+        'text/plain': plainBlob
+      });
+      await navigator.clipboard.write([item]);
+      return true;
+    }
+  } catch(e) {
+    console.warn('Clipboard API fallo:', e.message);
+  }
+  // Fallback: usar un elemento contenteditable + execCommand('copy')
+  try {
+    var div = document.createElement('div');
+    div.contentEditable = 'true';
+    div.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0;';
+    div.innerHTML = html;
+    document.body.appendChild(div);
+    var range = document.createRange();
+    range.selectNodeContents(div);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    var ok = document.execCommand('copy');
+    sel.removeAllRanges();
+    document.body.removeChild(div);
+    return ok;
+  } catch(e) {
+    console.warn('Fallback de copia fallo:', e.message);
+    return false;
+  }
 }
 
 // PDF - genera PDF real con jsPDF + html2canvas (sin headers/footers del navegador)
