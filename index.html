@@ -4,604 +4,714 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>App Fumigacion - Maniagro</title>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
-
-:root{--bg:#f0f2f5;--surface:#fff;--surface2:#f8f9fa;--border:#dde1e7;--border2:#c8cdd5;--yellow:#e6a800;--yellow2:#c49f00;--red:#c0392b;--green:#1a8a4a;--text:#1a1e26;--text2:#4a5568;--text3:#8a94a6;}
+:root{
+  --bg:#f0f2f5; --surface:#fff; --surface2:#f8f9fa;
+  --border:#dde1e7; --border2:#c8cdd5;
+  --yellow:#e6a800; --yellow2:#c49f00;
+  --red:#c0392b; --green:#1a8a4a;
+  --text:#1a1e26; --text2:#4a5568; --text3:#8a94a6;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-height:100vh;}
 .app{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
 @media(max-width:900px){.app{grid-template-columns:1fr;}}
+
 .panel-form{border-right:1px solid var(--border);padding:32px 28px;overflow-y:auto;background:#fff;}
 .panel-preview{padding:32px 28px;overflow-y:auto;background:var(--bg);}
+
 .app-header{display:flex;align-items:center;gap:12px;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid var(--yellow);}
 .app-title{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
 .app-sub{font-size:11px;color:var(--text3);margin-top:2px;}
-.form-section{margin-bottom:24px;}
-.section-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px;font-weight:700;}
-.section-label::after{content:"";flex:1;height:1px;background:var(--border);}
-.form-group{margin-bottom:14px;}
-.form-label{font-size:11px;color:var(--text2);margin-bottom:6px;display:block;font-weight:500;}
-.form-input{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:Arial,sans-serif;font-size:13px;padding:10px 12px;border-radius:4px;outline:none;transition:border-color .2s;}
-.form-input:focus{border-color:var(--yellow);}
-.form-input[type="date"]::-webkit-calendar-picker-indicator,.form-input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(.5) sepia(1) saturate(4) hue-rotate(5deg);cursor:pointer;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.ticket-num-display{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:10px 14px;font-size:12px;color:var(--yellow);letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;}
+
+.form-section{margin-bottom:22px;}
+.sec-lbl{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:8px;font-weight:700;}
+.sec-lbl::after{content:"";flex:1;height:1px;background:var(--border);}
+.form-group{margin-bottom:12px;}
+.f-lbl{font-size:11px;color:var(--text2);margin-bottom:5px;display:block;font-weight:500;}
+.f-inp{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:Arial,sans-serif;font-size:13px;padding:9px 11px;border-radius:4px;outline:none;transition:border-color .2s;}
+.f-inp:focus{border-color:var(--yellow);}
+.f-inp[type=date]::-webkit-calendar-picker-indicator,
+.f-inp[type=time]::-webkit-calendar-picker-indicator{filter:invert(.5) sepia(1) saturate(4) hue-rotate(5deg);cursor:pointer;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.tnum-box{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:9px 12px;font-size:12px;color:var(--yellow);letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;}
 .btn-regen{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;font-family:Arial,sans-serif;}
 .btn-regen:hover{color:var(--yellow);}
-/* DROPDOWNS */
-.dd-wrap{position:relative;}
-.dd-trigger{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;padding:10px 12px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;font-family:Arial,sans-serif;transition:border-color .2s;}
+
+/* DROPDOWN */
+.dd-trigger{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;padding:9px 11px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif;transition:border-color .2s;user-select:none;}
 .dd-trigger:hover,.dd-trigger.open{border-color:var(--yellow);}
-.dd-arrow{transition:transform .2s;font-size:10px;color:var(--text2);}
+.dd-arrow{font-size:10px;color:var(--text3);transition:transform .2s;}
 .dd-trigger.open .dd-arrow{transform:rotate(180deg);}
-.dd-panel{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface2);border:1px solid var(--yellow);border-radius:4px;z-index:100;display:none;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:280px;overflow-y:auto;}
+.dd-panel{display:none;width:100%;background:var(--surface2);border:1px solid var(--yellow);border-radius:4px;margin-top:4px;max-height:260px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.1);}
 .dd-panel.open{display:block;}
-.dd-option{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background .15s;}
-.dd-option:hover{background:var(--border);}
-.dd-option input[type="checkbox"]{accent-color:var(--yellow);width:14px;height:14px;cursor:pointer;flex-shrink:0;}
-.dd-option label{cursor:pointer;flex:1;font-size:13px;}
-.dd-option .opt-name{font-weight:600;color:var(--text);display:block;font-size:12px;}
-.dd-option .opt-sub{color:var(--text3);font-size:11px;display:block;}
-.dd-divider{height:1px;background:var(--border);margin:2px 0;}
-.dd-actions{display:flex;border-top:1px solid var(--border);}
-.dd-btn{flex:1;padding:8px;font-size:11px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:Arial,sans-serif;transition:color .15s,background .15s;}
-.dd-btn:hover{color:var(--yellow);background:var(--border);}
-.dd-btn:first-child{border-right:1px solid var(--border);}
+.dd-opt{display:flex;align-items:center;gap:10px;padding:9px 13px;cursor:pointer;transition:background .12s;}
+.dd-opt:hover{background:var(--border);}
+.dd-opt input[type=checkbox]{accent-color:var(--yellow);width:14px;height:14px;cursor:pointer;flex-shrink:0;}
+.dd-opt label{cursor:pointer;flex:1;}
+.dd-opt .opt-n{font-weight:600;font-size:12px;color:var(--text);display:block;}
+.dd-opt .opt-s{font-size:11px;color:var(--text3);display:block;}
+.dd-sep{height:1px;background:var(--border);margin:2px 0;}
+.dd-acts{display:flex;border-top:1px solid var(--border);}
+.dd-act{flex:1;padding:8px;font-size:11px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:Arial,sans-serif;transition:color .15s,background .15s;}
+.dd-act:hover{color:var(--yellow);background:var(--border);}
+.dd-act:first-child{border-right:1px solid var(--border);}
+
 /* CHIPS */
-.chips-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;min-height:10px;}
-.chip{background:var(--surface2);border:1px solid var(--border2);border-left:3px solid var(--yellow2);font-size:11px;padding:4px 10px;border-radius:2px;display:flex;align-items:center;gap:5px;}
-.chip.green{border-left-color:var(--green);}
-.chip.orange{border-left-color:#e07b00;}
-.chip-x{background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0;line-height:1;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;min-height:8px;}
+.chip{background:var(--surface2);border:1px solid var(--border2);border-left:3px solid var(--yellow2);font-size:11px;padding:3px 9px;border-radius:2px;display:flex;align-items:center;gap:5px;}
+.chip.g{border-left-color:var(--green);}
+.chip.o{border-left-color:#e07b00;}
+.chip-x{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0;line-height:1;}
 .chip-x:hover{color:var(--red);}
-.chip-none{font-size:12px;color:var(--text3);font-style:italic;padding:2px 0;}
+.chip-none{font-size:11px;color:var(--text3);font-style:italic;}
+
 /* ADD ROW */
-.add-row{display:flex;gap:8px;margin-top:10px;}
-.add-row .form-input{flex:1;}
-.btn-add{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);font-size:11px;padding:10px 14px;border-radius:4px;cursor:pointer;white-space:nowrap;font-family:Arial,sans-serif;transition:all .15s;}
+.add-row{display:flex;gap:7px;margin-top:8px;}
+.add-row .f-inp{flex:1;}
+.btn-add{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);font-size:11px;padding:9px 12px;border-radius:4px;cursor:pointer;white-space:nowrap;font-family:Arial,sans-serif;transition:all .15s;}
 .btn-add:hover{border-color:var(--yellow);color:var(--yellow);}
+
 /* MAIN BUTTONS */
-.btn-gen{width:100%;padding:14px;background:var(--yellow);color:#0f0f0f;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:8px;transition:background .2s;}
+.btn-gen{width:100%;padding:13px;background:var(--yellow);color:#0f0f0f;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:8px;transition:background .2s;}
 .btn-gen:hover{background:#ffd400;}
-.btn-send{width:100%;padding:13px;background:transparent;border:1.5px solid var(--green);color:var(--green);font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:4px;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.btn-send{width:100%;padding:12px;background:transparent;border:1.5px solid var(--green);color:var(--green);font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:4px;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
 .btn-send:hover{background:var(--green);color:#fff;}
-.btn-send:disabled,.btn-pdf:disabled{opacity:.4;cursor:not-allowed;}
-.btn-pdf{width:100%;padding:13px;background:transparent;border:1.5px solid #e07b00;color:#e07b00;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:4px;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.btn-pdf{width:100%;padding:12px;background:transparent;border:1.5px solid #e07b00;color:#e07b00;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:4px;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
 .btn-pdf:hover{background:#e07b00;color:#fff;}
+.btn-send:disabled,.btn-pdf:disabled{opacity:.4;cursor:not-allowed;}
+
 /* PREVIEW */
-.preview-header{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
-.preview-badge{background:var(--border);border-radius:20px;padding:3px 10px;font-size:9px;color:var(--text3);letter-spacing:2px;}
+.prev-hdr{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;}
+.prev-badge{background:var(--border);border-radius:20px;padding:3px 10px;font-size:9px;color:var(--text3);}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60%;gap:12px;opacity:.5;}
 .empty-icon{font-size:48px;}
 .empty-state p{font-size:11px;letter-spacing:2px;text-transform:uppercase;text-align:center;color:var(--text2);}
-/* TICKET STYLES */
+
+/* TICKET */
 .ticket{background:#fff;color:#1a1a1a;border-radius:4px;overflow:hidden;border:1.5px solid #d6d0c4;}
 .t-hdr{background:#1a1a1a;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
 .t-id{font-size:11px;color:#f0c400;letter-spacing:1px;}
-.t-ttl{padding:20px;border-bottom:2px solid #f0c400;display:flex;gap:14px;align-items:center;justify-content:center;text-align:center;}
+.t-ttl{padding:18px 20px;border-bottom:2px solid #f0c400;display:flex;gap:14px;align-items:center;justify-content:center;text-align:center;}
 .t-icon{width:44px;height:44px;background:#f0c400;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:2px 2px 0 #c49f00;}
-.t-ttl-txt h2{font-size:20px;font-weight:700;text-transform:uppercase;color:#c0392b;text-align:center;}
-.t-ttl-txt p{font-size:11px;color:#666;margin-top:4px;text-align:center;}
+.t-ttl-txt h2{font-size:20px;font-weight:700;text-transform:uppercase;color:#c0392b;}
+.t-ttl-txt p{font-size:11px;color:#666;margin-top:4px;}
 .t-meta{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #e8e5de;}
 .t-mi{padding:10px 14px;border-right:1px solid #e8e5de;}
 .t-mi:last-child{border-right:none;}
 .t-ml{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:3px;}
-.t-mv{font-size:12px;font-weight:600;color:#1a1a1a;}
+.t-mv{font-size:12px;font-weight:600;}
 .t-mv.red{color:#c0392b;}
-.t-sec{padding:16px 20px;border-bottom:1px solid #e8e5de;}
+.t-sec{padding:14px 20px;border-bottom:1px solid #e8e5de;}
 .t-sec:last-child{border-bottom:none;}
-.t-sl{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid #e8e5de;}
-.t-desc{font-size:12.5px;line-height:1.65;}
+.t-sl{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #e8e5de;}
+.t-desc{font-size:12px;line-height:1.65;}
 .t-desc strong{color:#c0392b;font-weight:700;}
-.t-sectors{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
-.t-sector{background:#f5f3ee;border:1.5px solid #d6d0c4;border-left:3px solid #c49f00;padding:6px 10px;font-size:11px;font-weight:600;border-radius:2px;}
-.t-pg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.t-pi{background:#f5f3ee;border:1.5px solid #d6d0c4;border-left:3px solid #e6a800;padding:8px 12px;border-radius:3px;display:flex;flex-direction:column;gap:3px;}
-.t-pl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#888;}
-.t-pv{font-size:13px;font-weight:700;}
-.t-ops{display:flex;gap:10px;flex-wrap:wrap;}
-.t-op{background:#f5f3ee;border:1.5px solid #d6d0c4;padding:8px 12px;border-radius:3px;display:flex;align-items:center;gap:8px;}
+.t-sectors{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;}
+.t-sector{background:#f5f3ee;border:1.5px solid #d6d0c4;border-left:3px solid #c49f00;padding:5px 9px;font-size:11px;font-weight:600;border-radius:2px;}
+.t-grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
+.t-card{background:#f5f3ee;border:1.5px solid #d6d0c4;border-left:3px solid #e6a800;padding:7px 11px;border-radius:3px;display:flex;flex-direction:column;gap:3px;}
+.t-card-lbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#888;}
+.t-card-val{font-size:12px;font-weight:700;}
+.t-ops{display:flex;gap:9px;flex-wrap:wrap;}
+.t-op{background:#f5f3ee;border:1.5px solid #d6d0c4;padding:7px 11px;border-radius:3px;display:flex;align-items:center;gap:8px;}
 .t-av{width:28px;height:28px;background:#1a1a1a;color:#f0c400;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
 .t-on{font-size:12px;font-weight:600;}
 .t-or{font-size:10px;color:#666;}
-.t-alert{background:#fdf2f1;border:1.5px solid #e8b4b0;border-left:4px solid #c0392b;border-radius:3px;padding:12px 14px;}
-.t-at{font-size:10px;font-weight:700;color:#c0392b;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.t-alert{background:#fdf2f1;border:1.5px solid #e8b4b0;border-left:4px solid #c0392b;border-radius:3px;padding:11px 13px;}
+.t-at{font-size:10px;font-weight:700;color:#c0392b;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;}
 .t-alert ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
-.t-alert li{font-size:12px;color:#7a2020;padding-left:14px;position:relative;line-height:1.5;}
-.t-alert li:before{content:"\25B6";position:absolute;left:0;font-size:8px;top:3px;color:#c0392b;}
-.t-badge{display:inline-block;background:#c0392b;color:#fff;font-size:9px;letter-spacing:1px;padding:2px 8px;border-radius:2px;margin-top:6px;text-transform:uppercase;font-weight:700;}
+.t-alert li{font-size:11.5px;color:#7a2020;padding-left:13px;position:relative;line-height:1.5;}
+.t-alert li::before{content:"\25B6";position:absolute;left:0;font-size:8px;top:3px;color:#c0392b;}
+.t-badge{display:inline-block;background:#c0392b;color:#fff;font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:2px;margin-top:5px;text-transform:uppercase;font-weight:700;}
 .t-tl{display:flex;flex-direction:column;}
-.t-tli{display:flex;gap:12px;position:relative;}
-.t-tli:not(:last-child):before{content:"";position:absolute;left:11px;top:26px;bottom:-4px;width:1px;background:#e8e5de;}
+.t-tli{display:flex;gap:11px;position:relative;}
+.t-tli:not(:last-child)::before{content:"";position:absolute;left:11px;top:26px;bottom:-4px;width:1px;background:#e8e5de;}
 .t-dot{width:24px;height:24px;border-radius:50%;border:2px solid #d6d0c4;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px;}
 .t-dot.a{background:#f0c400;border-color:#c49f00;}
 .t-dot.e{background:#edf7f1;border-color:#1a7a4a;}
-.t-tlc{padding:4px 0 16px;}
+.t-tlc{padding:4px 0 15px;}
 .t-tld{font-size:10px;font-weight:700;}
-.t-tldesc{font-size:11.5px;color:#555;margin-top:2px;line-height:1.5;}
-.t-cts{display:flex;flex-direction:column;gap:7px;}
-.t-ct{display:flex;align-items:center;justify-content:space-between;background:#f5f3ee;border:1.5px solid #d6d0c4;padding:8px 12px;border-radius:3px;}
+.t-tlds{font-size:11px;color:#555;margin-top:2px;line-height:1.4;}
+.t-cts{display:flex;flex-direction:column;gap:6px;}
+.t-ct{display:flex;align-items:center;justify-content:space-between;background:#f5f3ee;border:1.5px solid #d6d0c4;padding:7px 11px;border-radius:3px;}
 .t-cn{font-size:12px;font-weight:600;}
-.t-cp{font-size:11px;color:#555;background:#fff;border:1px solid #d6d0c4;padding:2px 8px;border-radius:20px;}
-.t-ftr{background:#f5f3ee;border-top:1px solid #d6d0c4;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
+.t-cp{font-size:11px;color:#555;background:#fff;border:1px solid #d6d0c4;padding:2px 7px;border-radius:20px;}
+.t-ftr{background:#f5f3ee;border-top:1px solid #d6d0c4;padding:9px 20px;display:flex;justify-content:space-between;align-items:center;}
 .t-ft{font-size:9px;color:#888;letter-spacing:1px;}
 .t-st{display:flex;align-items:center;gap:5px;background:#fff3cd;border:1px solid #f0c400;border-radius:20px;padding:3px 10px;font-size:9px;font-weight:700;color:#7a5c00;letter-spacing:1px;text-transform:uppercase;}
-.t-dot-pulse{width:6px;height:6px;border-radius:50%;background:#c49f00;animation:pulse 1.5s infinite;}
+.t-pulse{width:6px;height:6px;border-radius:50%;background:#c49f00;animation:pulse 1.5s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-/* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;color:#fff;font-size:12px;font-weight:700;padding:12px 20px;border-radius:4px;display:none;z-index:200;}
 ::-webkit-scrollbar{width:6px;}
 ::-webkit-scrollbar-track{background:#f0f2f5;}
 ::-webkit-scrollbar-thumb{background:#c8cdd5;border-radius:3px;}
-
 </style>
 </head>
 <body>
 <div class="app">
+
+<!-- PANEL FORMULARIO -->
 <div class="panel-form">
-<div class="app-header">
-<img src="data:image/jpeg;base64,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" alt="Maniagro" style="height:48px;width:auto;border-radius:3px;"/>
-<div><div class="app-title">Generador de Tickets</div>
-<div class="app-sub">Fumigacion con Fosfuro de Aluminio</div></div>
-</div>
-<div class="form-section">
-<div class="section-label">Identificacion</div>
-<div class="form-group">
-  <label class="form-label">Numero de Ticket</label>
-  <div class="ticket-num-display">
-    <span id="ticketNum">#FUM-0001</span>
-    <button class="btn-regen" onclick="regenNum()">&#8635; nuevo</button>
-  </div>
-</div>
-</div>
-<div class="form-section">
-<div class="section-label">Fecha y Hora de Inicio</div>
-<div class="two-col">
-  <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" type="date" id="fi"/></div>
-  <div class="form-group"><label class="form-label">Hora</label><input class="form-input" type="time" id="hi"/></div>
-</div>
-</div>
-<div class="form-section">
-<div class="section-label">Sectores Afectados</div>
-<div class="form-group">
-  <label class="form-label">Seleccionar sectores</label>
-  <div class="dd-wrap">
-    <div class="dd-trigger" id="sTrig" onclick="toggleDD('sTrig','sPanel')">
-      <span id="sTrigTxt">Elegir sectores...</span><span class="dd-arrow">&#9660;</span>
+  <div class="app-header">
+    <img src="data:image/jpeg;base64,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" alt="Maniagro" style="height:48px;width:auto;border-radius:3px;"/>
+    <div>
+      <div class="app-title">Generador de Tickets</div>
+      <div class="app-sub">Fumigacion con Fosfuro de Aluminio</div>
     </div>
-    <div class="dd-panel" id="sPanel">
-      <div class="dd-option"><input type="checkbox" id="s1" value="Deposito D1" onchange="updSectors()"><label for="s1">Deposito D1</label></div>
-      <div class="dd-option"><input type="checkbox" id="s2" value="Deposito D2" onchange="updSectors()"><label for="s2">Deposito D2</label></div>
-      <div class="dd-option"><input type="checkbox" id="s3" value="Deposito D3" onchange="updSectors()"><label for="s3">Deposito D3</label></div>
-      <div class="dd-option"><input type="checkbox" id="s4" value="Producto Elaborado" onchange="updSectors()"><label for="s4">Producto Elaborado</label></div>
-      <div class="dd-divider"></div>
-      <div class="dd-option"><input type="checkbox" id="s5" value="Pulmon Blanch" onchange="updSectors()"><label for="s5">Pulmon Blanch</label></div>
-      <div class="dd-option"><input type="checkbox" id="s6" value="Pulmon HPS1" onchange="updSectors()"><label for="s6">Pulmon HPS1</label></div>
-      <div class="dd-option"><input type="checkbox" id="s7" value="Planta Alergeno" onchange="updSectors()"><label for="s7">Planta Alergeno</label></div>
-      <div class="dd-option"><input type="checkbox" id="s8" value="Curado" onchange="updSectors()"><label for="s8">Curado</label></div>
-      <div class="dd-option"><input type="checkbox" id="s9" value="Josa" onchange="updSectors()"><label for="s9">Josa</label></div>
-      <div class="dd-option"><input type="checkbox" id="s10" value="Alvarez" onchange="updSectors()"><label for="s10">Alvarez</label></div>
-      <div class="dd-divider"></div>
-      <div class="dd-option"><input type="checkbox" id="s11" value="Deposito de Insumos" onchange="updSectors()"><label for="s11">Deposito de Insumos</label></div>
-      <div class="dd-actions">
-        <button class="dd-btn" onclick="selAll('sPanel',updSectors)">TODOS</button>
-        <button class="dd-btn" onclick="clrAll('sPanel',updSectors)">NINGUNO</button>
+  </div>
+
+  <!-- TICKET NUM -->
+  <div class="form-section">
+    <div class="sec-lbl">Identificacion</div>
+    <div class="form-group">
+      <label class="f-lbl">Numero de Ticket</label>
+      <div class="tnum-box">
+        <span id="ticketNum">#FUM-0001</span>
+        <button class="btn-regen" onclick="regenNum()">&#8635; nuevo</button>
       </div>
     </div>
   </div>
-  <div class="chips-wrap" id="sChips"><span class="chip-none">Ningun sector seleccionado</span></div>
-</div>
-</div>
-<div class="form-section">
-<div class="section-label">Producto y Lote</div>
-<div class="two-col">
-  <div class="form-group"><label class="form-label">Tipo de producto</label><input class="form-input" type="text" id="producto" placeholder="Ej: Mani en cascara"/></div>
-  <div class="form-group"><label class="form-label">Lote/s</label><input class="form-input" type="text" id="lotes" placeholder="Ej: L-001, L-002"/></div>
-</div>
-</div>
-<div class="form-section">
-<div class="section-label">Cronograma</div>
-<div class="two-col">
-  <div class="form-group"><label class="form-label">Fecha de liberacion</label><input class="form-input" type="date" id="fl"/></div>
-  <div class="form-group"><label class="form-label">Fecha reinicio actividades</label><input class="form-input" type="date" id="fr"/></div>
-</div>
-<div class="form-group"><label class="form-label">Hora reinicio actividades</label><input class="form-input" type="time" id="hr" value="06:00"/></div>
-</div>
-<div class="form-section">
-<div class="section-label">Destinatarios del Mail</div>
-<div class="dd-wrap">
-  <div class="dd-trigger" id="eTrig" onclick="toggleDD('eTrig','ePanel')">
-    <span id="eTrigTxt">Seleccionar destinatarios...</span><span class="dd-arrow">&#9660;</span>
+
+  <!-- FECHA HORA -->
+  <div class="form-section">
+    <div class="sec-lbl">Fecha y Hora de Inicio</div>
+    <div class="two-col">
+      <div class="form-group"><label class="f-lbl">Fecha</label><input class="f-inp" type="date" id="fi"/></div>
+      <div class="form-group"><label class="f-lbl">Hora</label><input class="f-inp" type="time" id="hi"/></div>
+    </div>
   </div>
-  <div class="dd-panel" id="ePanel">
-    <div class="dd-option"><input type="checkbox" id="e1"  onchange="updEmails()"><label for="e1"><span class="opt-name">Emilse Eroles</span><span class="opt-sub">eeroles@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e2"  onchange="updEmails()"><label for="e2"><span class="opt-name">Sergio Mignola</span><span class="opt-sub">smignola@croppers.com.ar</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e3"  onchange="updEmails()"><label for="e3"><span class="opt-name">Rodrigo Gutierrez</span><span class="opt-sub">rgutierrez@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e4"  onchange="updEmails()"><label for="e4"><span class="opt-name">Rodrigo Quiroga</span><span class="opt-sub">rquiroga@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e5"  onchange="updEmails()"><label for="e5"><span class="opt-name">Mario Gimenez</span><span class="opt-sub">mgimenez@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e6"  onchange="updEmails()"><label for="e6"><span class="opt-name">Natacha Fernandez</span><span class="opt-sub">nfernandez@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e7"  onchange="updEmails()"><label for="e7"><span class="opt-name">Gaston Dolso</span><span class="opt-sub">gdolso@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e8"  onchange="updEmails()"><label for="e8"><span class="opt-name">Guardia ADG</span><span class="opt-sub">guardia@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e9"  onchange="updEmails()"><label for="e9"><span class="opt-name">Yamila Calgaro</span><span class="opt-sub">ycalgaro@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e10" onchange="updEmails()"><label for="e10"><span class="opt-name">Alejandro Altamirano</span><span class="opt-sub">aaltamirano@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e11" onchange="updEmails()"><label for="e11"><span class="opt-name">Amaro Molina</span><span class="opt-sub">amolina@maniagro.com.ar</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e12" onchange="updEmails()"><label for="e12"><span class="opt-name">Dianela Ramirez</span><span class="opt-sub">dramirez@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e13" onchange="updEmails()"><label for="e13"><span class="opt-name">Capital Humano</span><span class="opt-sub">capitalhumano@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e14" onchange="updEmails()"><label for="e14"><span class="opt-name">Nerea Malacarne</span><span class="opt-sub">nmalacarne@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e15" onchange="updEmails()"><label for="e15"><span class="opt-name">Monica Quiroga</span><span class="opt-sub">mquiroga@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e16" onchange="updEmails()"><label for="e16"><span class="opt-name">Maria Virginia Sommaro</span><span class="opt-sub">msommaro@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e17" onchange="updEmails()"><label for="e17"><span class="opt-name">Micaela Cabrera</span><span class="opt-sub">mcabrera@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e18" onchange="updEmails()"><label for="e18"><span class="opt-name">Ricardo Caprin</span><span class="opt-sub">rcaprin@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e19" onchange="updEmails()"><label for="e19"><span class="opt-name">insumos</span><span class="opt-sub">insumos@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e20" onchange="updEmails()"><label for="e20"><span class="opt-name">David Lingua</span><span class="opt-sub">dlingua@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e21" onchange="updEmails()"><label for="e21"><span class="opt-name">Karen Carrizo</span><span class="opt-sub">kcarrizo@maniagro.com</span></label></div>
-    <div class="dd-option"><input type="checkbox" id="e22" onchange="updEmails()"><label for="e22"><span class="opt-name">Maria Belen Bozzo</span><span class="opt-sub">mbozzo@maniagro.com</span></label></div>
-    <div class="dd-actions">
-      <button class="dd-btn" onclick="selAll('ePanel',updEmails)">TODOS</button>
-      <button class="dd-btn" onclick="clrAll('ePanel',updEmails)">NINGUNO</button>
+
+  <!-- SECTORES -->
+  <div class="form-section">
+    <div class="sec-lbl">Sectores Afectados</div>
+    <div class="form-group">
+      <label class="f-lbl">Seleccionar sectores</label>
+      <div class="dd-trigger" id="sTrig" onclick="toggleDD('sPanel','sTrig')">
+        <span id="sTrigTxt">Elegir sectores...</span>
+        <span class="dd-arrow">&#9660;</span>
+      </div>
+      <div class="dd-panel" id="sPanel">
+        <div class="dd-opt"><input type="checkbox" id="s1" value="Deposito D1" onchange="updSectors()"><label for="s1">Deposito D1</label></div>
+        <div class="dd-opt"><input type="checkbox" id="s2" value="Deposito D2" onchange="updSectors()"><label for="s2">Deposito D2</label></div>
+        <div class="dd-opt"><input type="checkbox" id="s3" value="Deposito D3" onchange="updSectors()"><label for="s3">Deposito D3</label></div>
+        <div class="dd-opt"><input type="checkbox" id="s4" value="Producto Elaborado" onchange="updSectors()"><label for="s4">Producto Elaborado</label></div>
+        <div class="dd-sep"></div>
+        <div class="dd-opt"><input type="checkbox" id="s5" value="Pulmon Blanch" onchange="updSectors()"><label for="s5">Pulmon Blanch</label></div>
+        <div class="dd-opt"><input type="checkbox" id="s6" value="Pulmon HPS1" onchange="updSectors()"><label for="s6">Pulmon HPS1</label></div>
+        <div class="dd-opt"><input type="checkbox" id="s7" value="Planta Alergeno" onchange="updSectors()"><label for="s7">Planta Alergeno</label></div>
+        <div class="dd-opt"><input type="checkbox" id="s8" value="Curado" onchange="updSectors()"><label for="s8">Curado</label></div>
+        <div class="dd-opt"><input type="checkbox" id="s9" value="Josa" onchange="updSectors()"><label for="s9">Josa</label></div>
+        <div class="dd-opt"><input type="checkbox" id="s10" value="Alvarez" onchange="updSectors()"><label for="s10">Alvarez</label></div>
+        <div class="dd-sep"></div>
+        <div class="dd-opt"><input type="checkbox" id="s11" value="Deposito de Insumos" onchange="updSectors()"><label for="s11">Deposito de Insumos</label></div>
+        <div class="dd-acts">
+          <button class="dd-act" onclick="selAll('sPanel'); updSectors()">TODOS</button>
+          <button class="dd-act" onclick="clrAll('sPanel'); updSectors()">NINGUNO</button>
+        </div>
+      </div>
+      <div class="chips" id="sChips"><span class="chip-none">Ningun sector seleccionado</span></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTO LOTE QUIMICO -->
+  <div class="form-section">
+    <div class="sec-lbl">Producto, Lote y Quimico</div>
+    <div class="two-col">
+      <div class="form-group">
+        <label class="f-lbl">Tipo/s de producto</label>
+        <input class="f-inp" type="text" id="producto" placeholder="Ej: Mani, Poroto, Maiz"/>
+      </div>
+      <div class="form-group">
+        <label class="f-lbl">Lote/s</label>
+        <input class="f-inp" type="text" id="lotes" placeholder="Ej: L-001, L-002"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="f-lbl">Quimico/s utilizado/s</label>
+      <input class="f-inp" type="text" id="quimico" placeholder="Ej: Fosfuro de Aluminio, Bifentrina"/>
+    </div>
+  </div>
+
+  <!-- CRONOGRAMA -->
+  <div class="form-section">
+    <div class="sec-lbl">Cronograma</div>
+    <div class="two-col">
+      <div class="form-group"><label class="f-lbl">Fecha de liberacion</label><input class="f-inp" type="date" id="fl"/></div>
+      <div class="form-group"><label class="f-lbl">Fecha reinicio actividades</label><input class="f-inp" type="date" id="fr"/></div>
+    </div>
+    <div class="form-group"><label class="f-lbl">Hora reinicio actividades</label><input class="f-inp" type="time" id="hr" value="06:00"/></div>
+  </div>
+
+  <!-- DESTINATARIOS -->
+  <div class="form-section">
+    <div class="sec-lbl">Destinatarios del Mail</div>
+    <div class="dd-trigger" id="eTrig" onclick="toggleDD('ePanel','eTrig')">
+      <span id="eTrigTxt">Seleccionar destinatarios...</span>
+      <span class="dd-arrow">&#9660;</span>
+    </div>
+    <div class="dd-panel" id="ePanel">
+      <div class="dd-opt"><input type="checkbox" id="e1"  onchange="updEmails()"><label for="e1"><span class="opt-n">Emilse Eroles</span><span class="opt-s">eeroles@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e2"  onchange="updEmails()"><label for="e2"><span class="opt-n">Sergio Mignola</span><span class="opt-s">smignola@croppers.com.ar</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e3"  onchange="updEmails()"><label for="e3"><span class="opt-n">Rodrigo Gutierrez</span><span class="opt-s">rgutierrez@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e4"  onchange="updEmails()"><label for="e4"><span class="opt-n">Rodrigo Quiroga</span><span class="opt-s">rquiroga@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e5"  onchange="updEmails()"><label for="e5"><span class="opt-n">Mario Gimenez</span><span class="opt-s">mgimenez@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e6"  onchange="updEmails()"><label for="e6"><span class="opt-n">Natacha Fernandez</span><span class="opt-s">nfernandez@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e7"  onchange="updEmails()"><label for="e7"><span class="opt-n">Gaston Dolso</span><span class="opt-s">gdolso@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e8"  onchange="updEmails()"><label for="e8"><span class="opt-n">Guardia ADG</span><span class="opt-s">guardia@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e9"  onchange="updEmails()"><label for="e9"><span class="opt-n">Yamila Calgaro</span><span class="opt-s">ycalgaro@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e10" onchange="updEmails()"><label for="e10"><span class="opt-n">Alejandro Altamirano</span><span class="opt-s">aaltamirano@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e11" onchange="updEmails()"><label for="e11"><span class="opt-n">Amaro Molina</span><span class="opt-s">amolina@maniagro.com.ar</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e12" onchange="updEmails()"><label for="e12"><span class="opt-n">Dianela Ramirez</span><span class="opt-s">dramirez@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e13" onchange="updEmails()"><label for="e13"><span class="opt-n">Capital Humano</span><span class="opt-s">capitalhumano@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e14" onchange="updEmails()"><label for="e14"><span class="opt-n">Nerea Malacarne</span><span class="opt-s">nmalacarne@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e15" onchange="updEmails()"><label for="e15"><span class="opt-n">Monica Quiroga</span><span class="opt-s">mquiroga@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e16" onchange="updEmails()"><label for="e16"><span class="opt-n">Maria Virginia Sommaro</span><span class="opt-s">msommaro@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e17" onchange="updEmails()"><label for="e17"><span class="opt-n">Micaela Cabrera</span><span class="opt-s">mcabrera@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e18" onchange="updEmails()"><label for="e18"><span class="opt-n">Ricardo Caprin</span><span class="opt-s">rcaprin@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e19" onchange="updEmails()"><label for="e19"><span class="opt-n">insumos</span><span class="opt-s">insumos@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e20" onchange="updEmails()"><label for="e20"><span class="opt-n">David Lingua</span><span class="opt-s">dlingua@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e21" onchange="updEmails()"><label for="e21"><span class="opt-n">Karen Carrizo</span><span class="opt-s">kcarrizo@maniagro.com</span></label></div>
+      <div class="dd-opt"><input type="checkbox" id="e22" onchange="updEmails()"><label for="e22"><span class="opt-n">Maria Belen Bozzo</span><span class="opt-s">mbozzo@maniagro.com</span></label></div>
+      <div class="dd-acts">
+        <button class="dd-act" onclick="selAll('ePanel'); updEmails()">TODOS</button>
+        <button class="dd-act" onclick="clrAll('ePanel'); updEmails()">NINGUNO</button>
+      </div>
+    </div>
+    <div class="chips" id="eChips"><span class="chip-none">Ningun destinatario seleccionado</span></div>
+    <div class="add-row">
+      <input class="f-inp" type="text" id="newName" placeholder="Nombre adicional"/>
+      <input class="f-inp" type="email" id="newAddr" placeholder="email@empresa.com"/>
+      <button class="btn-add" onclick="addExtra()">+ Agregar</button>
+    </div>
+  </div>
+
+  <!-- CUENTA REMITENTE -->
+  <div class="form-section">
+    <div class="sec-lbl">Cuenta Remitente (Gmail)</div>
+    <div class="form-group">
+      <select class="f-inp" id="fromAccount">
+        <option value="mdip@maniagro.com">mdip@maniagro.com (Principal)</option>
+        <option value="gip@maniagro.com">gip@maniagro.com (Secundaria)</option>
+        <option value="rgutierrez@maniagro.com">rgutierrez@maniagro.com (Terciaria)</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn-gen"  onclick="genTicket()">&#9881; Generar Vista Previa</button>
+  <button class="btn-send" id="btnSend" onclick="sendGmail()" disabled>&#9993; Descargar PDF y Abrir Gmail</button>
+  <button class="btn-pdf"  id="btnPDF"  onclick="dlPDF()"    disabled>&#11015; Solo Descargar PDF</button>
+</div>
+
+<!-- PANEL PREVIEW -->
+<div class="panel-preview">
+  <div class="prev-hdr">
+    <span>Vista previa del ticket</span>
+    <span class="prev-badge">LIVE PREVIEW</span>
+  </div>
+  <div id="previewArea">
+    <div class="empty-state">
+      <div class="empty-icon">&#128194;</div>
+      <p>Completa el formulario<br>y genera el ticket</p>
     </div>
   </div>
 </div>
-<div class="chips-wrap" id="eChips"><span class="chip-none">Ningun destinatario seleccionado</span></div>
-<div class="add-row">
-  <input class="form-input" type="text" id="newName" placeholder="Nombre (adicional)"/>
-  <input class="form-input" type="email" id="newAddr" placeholder="email@empresa.com"/>
-  <button class="btn-add" onclick="addExtra()">+ Agregar</button>
-</div>
-</div>
-<button class="btn-gen" onclick="genTicket()">&#9881; Generar Vista Previa</button>
-<button class="btn-send" id="btnSend" onclick="sendEmail()" disabled>&#9993; Enviar por Mail</button>
-<button class="btn-pdf"  id="btnPDF"  onclick="dlPDF()"     disabled>&#11015; Descargar PDF</button>
-</div>
-<div class="panel-preview">
-<div class="preview-header">
-  <span>Vista previa del ticket</span>
-  <span class="preview-badge">LIVE PREVIEW</span>
-</div>
-<div id="previewArea">
-  <div class="empty-state">
-    <div class="empty-icon">&#128194;</div>
-    <p>Completa el formulario<br>y genera el ticket</p>
-  </div>
-</div>
-</div>
-</div>
+
+</div><!-- .app -->
 <div class="toast" id="toast"></div>
+
 <script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   APP DE TICKETS DE FUMIGACION
+   ───────────────────────────────────────────────────────────────────────────
+   Flujo de envio:
+   1) El usuario completa el formulario y genera la vista previa
+   2) Elige desde que cuenta de Gmail enviar (3 opciones)
+   3) Al tocar "Descargar PDF y Abrir Gmail":
+      - Se abre una ventana con el ticket listo para Imprimir/Guardar como PDF
+      - Se abre Gmail web en otra pestana con destinatarios, asunto y cuerpo
+        pre-cargados, usando la cuenta elegida (authuser=)
+      - El usuario arrastra el PDF descargado al mail y envia
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-var EJS_PUBLIC_KEY  = "TU_PUBLIC_KEY";
-var EJS_SERVICE_ID  = "TU_SERVICE_ID";
-var EJS_TEMPLATE_ID = "TU_TEMPLATE_ID";
-emailjs.init({ publicKey: EJS_PUBLIC_KEY });
+var selSectors  = [];
+var selEmails   = [];
+var extraEmails = [];
+var ticketOK    = false;
+var ticketCtr   = Math.floor(Math.random()*900)+100;
 
-var ticketCounter = Math.floor(Math.random()*900)+100;
-var selSectors   = [];
-var selEmails    = [];
-var extraEmails  = [];
-var ticketReady  = false;
-
-var EMAIL_DATA = [
-  {name:"Emilse Eroles",          addr:"eeroles@maniagro.com"},
-  {name:"Sergio Mignola",         addr:"smignola@croppers.com.ar"},
-  {name:"Rodrigo Gutierrez",      addr:"rgutierrez@maniagro.com"},
-  {name:"Rodrigo Quiroga",        addr:"rquiroga@maniagro.com"},
-  {name:"Mario Gimenez",          addr:"mgimenez@maniagro.com"},
-  {name:"Natacha Fernandez",      addr:"nfernandez@maniagro.com"},
-  {name:"Gaston Dolso",           addr:"gdolso@maniagro.com"},
-  {name:"Guardia ADG",            addr:"guardia@maniagro.com"},
-  {name:"Yamila Calgaro",         addr:"ycalgaro@maniagro.com"},
-  {name:"Alejandro Altamirano",   addr:"aaltamirano@maniagro.com"},
-  {name:"Amaro Molina",           addr:"amolina@maniagro.com.ar"},
-  {name:"Dianela Ramirez",        addr:"dramirez@maniagro.com"},
-  {name:"Capital Humano",         addr:"capitalhumano@maniagro.com"},
-  {name:"Nerea Malacarne",        addr:"nmalacarne@maniagro.com"},
-  {name:"Monica Quiroga",         addr:"mquiroga@maniagro.com"},
-  {name:"Maria Virginia Sommaro", addr:"msommaro@maniagro.com"},
-  {name:"Micaela Cabrera",        addr:"mcabrera@maniagro.com"},
-  {name:"Ricardo Caprin",         addr:"rcaprin@maniagro.com"},
-  {name:"insumos",                addr:"insumos@maniagro.com"},
-  {name:"David Lingua",           addr:"dlingua@maniagro.com"},
-  {name:"Karen Carrizo",          addr:"kcarrizo@maniagro.com"},
-  {name:"Maria Belen Bozzo",      addr:"mbozzo@maniagro.com"}
+var EDATA = [
+  {n:'Emilse Eroles',          a:'eeroles@maniagro.com'},
+  {n:'Sergio Mignola',         a:'smignola@croppers.com.ar'},
+  {n:'Rodrigo Gutierrez',      a:'rgutierrez@maniagro.com'},
+  {n:'Rodrigo Quiroga',        a:'rquiroga@maniagro.com'},
+  {n:'Mario Gimenez',          a:'mgimenez@maniagro.com'},
+  {n:'Natacha Fernandez',      a:'nfernandez@maniagro.com'},
+  {n:'Gaston Dolso',           a:'gdolso@maniagro.com'},
+  {n:'Guardia ADG',            a:'guardia@maniagro.com'},
+  {n:'Yamila Calgaro',         a:'ycalgaro@maniagro.com'},
+  {n:'Alejandro Altamirano',   a:'aaltamirano@maniagro.com'},
+  {n:'Amaro Molina',           a:'amolina@maniagro.com.ar'},
+  {n:'Dianela Ramirez',        a:'dramirez@maniagro.com'},
+  {n:'Capital Humano',         a:'capitalhumano@maniagro.com'},
+  {n:'Nerea Malacarne',        a:'nmalacarne@maniagro.com'},
+  {n:'Monica Quiroga',         a:'mquiroga@maniagro.com'},
+  {n:'Maria Virginia Sommaro', a:'msommaro@maniagro.com'},
+  {n:'Micaela Cabrera',        a:'mcabrera@maniagro.com'},
+  {n:'Ricardo Caprin',         a:'rcaprin@maniagro.com'},
+  {n:'insumos',                a:'insumos@maniagro.com'},
+  {n:'David Lingua',           a:'dlingua@maniagro.com'},
+  {n:'Karen Carrizo',          a:'kcarrizo@maniagro.com'},
+  {n:'Maria Belen Bozzo',      a:'mbozzo@maniagro.com'}
 ];
 
 // INIT
-(function(){
+window.onload = function() {
   var t = new Date();
-  function fmt(d){ return d.toISOString().slice(0,10); }
-  document.getElementById("fi").value = fmt(t);
-  document.getElementById("hi").value = "15:45";
+  function iso(d) { return d.toISOString().slice(0,10); }
+  document.getElementById('fi').value = iso(t);
+  document.getElementById('hi').value = '15:45';
   var lib = new Date(t); lib.setDate(lib.getDate()+7);
-  document.getElementById("fl").value = fmt(lib);
+  document.getElementById('fl').value = iso(lib);
   var rei = new Date(lib); rei.setDate(rei.getDate()+3);
-  document.getElementById("fr").value = fmt(rei);
-  updTicketNum();
-  document.addEventListener("click", function(e){
-    closeDD("sTrig","sPanel",e);
-    closeDD("eTrig","ePanel",e);
+  document.getElementById('fr').value = iso(rei);
+  updTNum();
+  // Restaurar cuenta remitente preferida
+  try {
+    var savedAcc = localStorage.getItem('fum_from_account');
+    if (savedAcc) {
+      var sel = document.getElementById('fromAccount');
+      for (var i=0; i<sel.options.length; i++) {
+        if (sel.options[i].value === savedAcc) { sel.selectedIndex = i; break; }
+      }
+    }
+  } catch(e) {}
+  document.addEventListener('click', function(ev) {
+    closePanelIfOutside('sPanel','sTrig', ev);
+    closePanelIfOutside('ePanel','eTrig', ev);
   });
-})();
+};
 
-function updTicketNum(){
-  var d=new Date(), y=String(d.getFullYear()).slice(-2), m=String(d.getMonth()+1).padStart(2,"0");
-  document.getElementById("ticketNum").textContent = "#FUM-"+y+m+"-"+String(ticketCounter).padStart(3,"0");
-}
-function regenNum(){ ticketCounter=Math.floor(Math.random()*900)+100; updTicketNum(); if(ticketReady) genTicket(); }
-function getNum(){ return document.getElementById("ticketNum").textContent; }
-
-// DROPDOWN HELPERS
-function toggleDD(trigId, panelId){
-  document.getElementById(panelId).classList.toggle("open");
-  document.getElementById(trigId).classList.toggle("open");
-}
-function closeDD(trigId, panelId, e){
-  var p=document.getElementById(panelId), t=document.getElementById(trigId);
-  if(p && t && !p.contains(e.target) && !t.contains(e.target)){
-    p.classList.remove("open"); t.classList.remove("open");
+function closePanelIfOutside(panelId, trigId, ev) {
+  var p = document.getElementById(panelId);
+  var t = document.getElementById(trigId);
+  if (p && t && !p.contains(ev.target) && !t.contains(ev.target)) {
+    p.classList.remove('open');
+    t.classList.remove('open');
   }
 }
-function selAll(panelId, cb){ document.querySelectorAll("#"+panelId+" input[type=checkbox]").forEach(function(c){c.checked=true;}); cb(); }
-function clrAll(panelId, cb){ document.querySelectorAll("#"+panelId+" input[type=checkbox]").forEach(function(c){c.checked=false;}); cb(); }
+
+// TICKET NUMBER
+function updTNum() {
+  var d = new Date();
+  var y = String(d.getFullYear()).slice(-2);
+  var m = String(d.getMonth()+1).padStart(2,'0');
+  document.getElementById('ticketNum').textContent = '#FUM-' + y + m + '-' + String(ticketCtr).padStart(3,'0');
+}
+function regenNum() { ticketCtr = Math.floor(Math.random()*900)+100; updTNum(); if(ticketOK) genTicket(); }
+function getNum()   { return document.getElementById('ticketNum').textContent; }
+
+// DROPDOWN TOGGLE
+function toggleDD(panelId, trigId) {
+  document.getElementById(panelId).classList.toggle('open');
+  document.getElementById(trigId).classList.toggle('open');
+}
+function selAll(panelId) {
+  document.querySelectorAll('#'+panelId+' input[type=checkbox]').forEach(function(c){ c.checked = true; });
+}
+function clrAll(panelId) {
+  document.querySelectorAll('#'+panelId+' input[type=checkbox]').forEach(function(c){ c.checked = false; });
+}
 
 // SECTORS
-function updSectors(){
-  selSectors=[];
-  document.querySelectorAll("#sPanel input:checked").forEach(function(c){ selSectors.push(c.value); });
-  var wrap=document.getElementById("sChips");
-  if(!selSectors.length){ wrap.innerHTML='<span class="chip-none">Ningun sector seleccionado</span>'; }
-  else{ wrap.innerHTML=selSectors.map(function(s){ return '<div class="chip">'+s+'<button class="chip-x" onclick="unchkSector(''+s+'')">&#215;</button></div>'; }).join(""); }
-  var n=selSectors.length;
-  document.getElementById("sTrigTxt").textContent = n ? n+" sector"+(n>1?"es":"")+" seleccionado"+(n>1?"s":"") : "Elegir sectores...";
+function updSectors() {
+  selSectors = [];
+  document.querySelectorAll('#sPanel input:checked').forEach(function(c){ selSectors.push(c.value); });
+  var wrap = document.getElementById('sChips');
+  if (!selSectors.length) {
+    wrap.innerHTML = '<span class="chip-none">Ningun sector seleccionado</span>';
+  } else {
+    wrap.innerHTML = selSectors.map(function(s) {
+      return '<div class="chip">' + s + '<button class="chip-x" onclick="unchkS(\'' + s.replace(/'/g, "\\'") + '\')">&#215;</button></div>';
+    }).join('');
+  }
+  var n = selSectors.length;
+  document.getElementById('sTrigTxt').textContent = n
+    ? n + ' sector' + (n>1?'es':'') + ' seleccionado' + (n>1?'s':'')
+    : 'Elegir sectores...';
 }
-function unchkSector(v){
-  document.querySelectorAll("#sPanel input").forEach(function(c){ if(c.value===v) c.checked=false; });
+function unchkS(v) {
+  document.querySelectorAll('#sPanel input').forEach(function(c){ if(c.value===v) c.checked=false; });
   updSectors();
 }
 
 // EMAILS
-function updEmails(){
-  selEmails=[];
-  for(var i=1;i<=22;i++){
-    var cb=document.getElementById("e"+i);
-    if(cb && cb.checked) selEmails.push(EMAIL_DATA[i-1]);
+function updEmails() {
+  selEmails = [];
+  for (var i = 1; i <= 22; i++) {
+    var cb = document.getElementById('e'+i);
+    if (cb && cb.checked) selEmails.push(EDATA[i-1]);
   }
   renderEChips();
 }
-function renderEChips(){
-  var wrap=document.getElementById("eChips");
-  var all=selEmails.concat(extraEmails);
-  if(!all.length){ wrap.innerHTML='<span class="chip-none">Ningun destinatario seleccionado</span>'; }
-  else{
-    wrap.innerHTML=
-      selEmails.map(function(e,i){ return '<div class="chip green">'+e.name+'<button class="chip-x" onclick="unchkEmail('+i+')">&#215;</button></div>'; }).join("")+
-      extraEmails.map(function(e,i){ return '<div class="chip orange">'+e.name+' <small>(extra)</small><button class="chip-x" onclick="rmExtra('+i+')">&#215;</button></div>'; }).join("");
+function renderEChips() {
+  var wrap = document.getElementById('eChips');
+  var all  = selEmails.concat(extraEmails);
+  if (!all.length) {
+    wrap.innerHTML = '<span class="chip-none">Ningun destinatario seleccionado</span>';
+  } else {
+    wrap.innerHTML =
+      selEmails.map(function(e,i) {
+        return '<div class="chip g">' + e.n + '<button class="chip-x" onclick="unchkE('+i+')">&#215;</button></div>';
+      }).join('') +
+      extraEmails.map(function(e,i) {
+        return '<div class="chip o">' + e.n + ' <small>(extra)</small><button class="chip-x" onclick="rmExtra('+i+')">&#215;</button></div>';
+      }).join('');
   }
-  var tot=all.length;
-  document.getElementById("eTrigTxt").textContent = tot ? tot+" destinatario"+(tot>1?"s":"")+" seleccionado"+(tot>1?"s":"") : "Seleccionar destinatarios...";
+  var tot = all.length;
+  document.getElementById('eTrigTxt').textContent = tot
+    ? tot + ' destinatario' + (tot>1?'s':'') + ' seleccionado' + (tot>1?'s':'')
+    : 'Seleccionar destinatarios...';
 }
-function unchkEmail(i){
-  var addr=selEmails[i].addr;
-  for(var j=1;j<=22;j++){ var cb=document.getElementById("e"+j); if(cb && EMAIL_DATA[j-1].addr===addr){ cb.checked=false; break; } }
+function unchkE(i) {
+  var addr = selEmails[i].a;
+  for (var j=1; j<=22; j++) { var cb=document.getElementById('e'+j); if(cb && EDATA[j-1].a===addr){ cb.checked=false; break; } }
   updEmails();
 }
-function addExtra(){
-  var name=document.getElementById("newName").value.trim();
-  var addr=document.getElementById("newAddr").value.trim();
-  if(!addr.includes("@")){ alert("Ingresa un email valido."); return; }
-  extraEmails.push({name:name||addr,addr:addr});
-  document.getElementById("newName").value="";
-  document.getElementById("newAddr").value="";
+function addExtra() {
+  var n = document.getElementById('newName').value.trim();
+  var a = document.getElementById('newAddr').value.trim();
+  if (!a.includes('@')) { alert('Ingresa un email valido.'); return; }
+  extraEmails.push({n:n||a, a:a});
+  document.getElementById('newName').value = '';
+  document.getElementById('newAddr').value = '';
   renderEChips();
 }
-function rmExtra(i){ extraEmails.splice(i,1); renderEChips(); }
-function getAllEmails(){ return selEmails.concat(extraEmails); }
+function rmExtra(i) { extraEmails.splice(i,1); renderEChips(); }
+function allEmails() { return selEmails.concat(extraEmails); }
 
 // DATE HELPERS
-function fmtDate(s){
-  if(!s) return "-";
-  var p=s.split("-"), dias=["Dom","Lun","Mar","Mie","Jue","Vie","Sab"];
-  return dias[new Date(p[0],p[1]-1,p[2]).getDay()]+" "+p[2]+"/"+p[1]+"/"+p[0];
+function fmtD(s) {
+  if (!s) return '-';
+  var p=s.split('-'), dias=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+  return dias[new Date(p[0],p[1]-1,p[2]).getDay()] + ' ' + p[2]+'/'+p[1]+'/'+p[0];
 }
-function fmtLong(s){
-  if(!s) return "-";
-  var p=s.split("-"), meses=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-  return parseInt(p[2])+" de "+meses[p[1]-1]+" de "+p[0];
+function fmtL(s) {
+  if (!s) return '-';
+  var p=s.split('-'), M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return parseInt(p[2]) + ' de ' + M[p[1]-1] + ' de ' + p[0];
 }
-function initials(n){ var p=n.trim().split(" "); return (p[0][0]+(p[1]?p[1][0]:"")).toUpperCase(); }
+function inits(n) { var p=n.trim().split(' '); return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase(); }
 
 // GENERATE TICKET
-function genTicket(){
-  var fi=document.getElementById("fi").value;
-  var hi=document.getElementById("hi").value;
-  var fl=document.getElementById("fl").value;
-  var fr=document.getElementById("fr").value;
-  var hr=document.getElementById("hr").value;
-  var prod=document.getElementById("producto").value.trim();
-  var lots=document.getElementById("lotes").value.trim();
-  if(!fi||!hi){ alert("Completa la fecha y hora de inicio."); return; }
-  if(!selSectors.length){ alert("Selecciona al menos un sector."); return; }
-  var tNum=getNum(), hf=hi.slice(0,5), hrf=hr.slice(0,5);
-  var sectH=selSectors.map(function(s){ return '<div class="t-sector">'+s+'</div>'; }).join("");
-  var prodH="";
-  if(prod||lots){
-    prodH='<div class="t-sec"><div class="t-sl">Producto y Lote</div><div class="t-pg">'
-      +(prod?'<div class="t-pi"><span class="t-pl">Tipo de Producto</span><span class="t-pv">'+prod+'</span></div>':"")
-      +(lots?'<div class="t-pi"><span class="t-pl">Lote/s</span><span class="t-pv">'+lots+'</span></div>':"")
-      +'</div></div>';
+function genTicket() {
+  var fi  = document.getElementById('fi').value;
+  var hi  = document.getElementById('hi').value;
+  var fl  = document.getElementById('fl').value;
+  var fr  = document.getElementById('fr').value;
+  var hr  = document.getElementById('hr').value;
+  var prd = document.getElementById('producto').value.trim();
+  var lot = document.getElementById('lotes').value.trim();
+  var qim = document.getElementById('quimico').value.trim();
+
+  if (!fi||!hi) { alert('Completa la fecha y hora de inicio.'); return; }
+  if (!selSectors.length) { alert('Selecciona al menos un sector.'); return; }
+
+  var tNum = getNum();
+  var hf   = hi.slice(0,5);
+  var hrf  = hr.slice(0,5);
+
+  // Sectors
+  var sectH = selSectors.map(function(s){ return '<div class="t-sector">'+s+'</div>'; }).join('');
+
+  // Producto / Lote / Quimico block
+  var pBlock = '';
+  if (prd || lot || qim) {
+    pBlock = '<div class="t-sec"><div class="t-sl">Producto, Lote y Quimico</div><div class="t-grid2">';
+    if (prd) pBlock += '<div class="t-card"><span class="t-card-lbl">Tipo/s de Producto</span><span class="t-card-val">'+prd+'</span></div>';
+    if (lot) pBlock += '<div class="t-card"><span class="t-card-lbl">Lote/s</span><span class="t-card-val">'+lot+'</span></div>';
+    if (qim) pBlock += '<div class="t-card" style="border-left-color:#1a8a4a"><span class="t-card-lbl">Quimico/s Utilizado/s</span><span class="t-card-val">'+qim+'</span></div>';
+    pBlock += '</div></div>';
   }
-  var ops=[{n:"Ezequiel Pereyra",r:"Operario Fumigador"},{n:"Franco Gutierrez",r:"Operario Fumigador"}];
-  var opsH=ops.map(function(o){ return '<div class="t-op"><div class="t-av">'+initials(o.n)+'</div><div><div class="t-on">'+o.n+'</div><div class="t-or">'+o.r+'</div></div></div>'; }).join("");
-  var cts=[{n:"Pereyra Isaias Ezequiel",p:"358 514-5055"},{n:"Gutierrez Franco",p:"358 487-4894"},{n:"Mayra Dip",p:"349 341-8445"}];
-  var ctsH=cts.map(function(c){ return '<div class="t-ct"><div class="t-cn">'+c.n+'</div><div class="t-cp">&#128222; '+c.p+'</div></div>'; }).join("");
 
-  var LOGO = "data:image/jpeg;base64,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";
+  // Operarios
+  var ops = [{n:'Ezequiel Pereyra',r:'Operario Fumigador'},{n:'Franco Gutierrez',r:'Operario Fumigador'}];
+  var opsH = ops.map(function(o){
+    return '<div class="t-op"><div class="t-av">'+inits(o.n)+'</div><div><div class="t-on">'+o.n+'</div><div class="t-or">'+o.r+'</div></div></div>';
+  }).join('');
 
-  var html='<div class="ticket">'
-    +'<div class="t-hdr"><img src="'+LOGO+'" alt="Maniagro" style="height:32px;width:auto;border-radius:2px;"/><span class="t-id">'+tNum+'</span></div>'
-    +'<div class="t-ttl"><div class="t-icon">&#9888;&#65039;</div><div class="t-ttl-txt"><h2>AVISO DE FUMIGACION</h2><p>Notificacion oficial &middot; Difusion inmediata a todo el personal</p></div></div>'
-    +'<div class="t-meta"><div class="t-mi"><div class="t-ml">Fecha</div><div class="t-mv">'+fmtDate(fi)+'</div></div>'
-    +'<div class="t-mi"><div class="t-ml">Hora</div><div class="t-mv red">'+hf+' hs</div></div>'
-    +'<div class="t-mi"><div class="t-ml">Estado</div><div class="t-mv red">&#9888; Activo</div></div></div>'
-    +'<div class="t-sec"><div class="t-sl">Descripcion de la Operacion</div>'
-    +'<p class="t-desc">El dia <strong>'+fmtLong(fi)+'</strong>, a partir de las <strong>'+hf+' hs</strong>, se daran inicio las actividades de <strong>fumigacion con Fosfuro de Aluminio (PH3)</strong> en los sectores indicados. Se solicita difusion inmediata a todo el personal.</p></div>'
-    +'<div class="t-sec"><div class="t-sl">Sectores Afectados</div><div class="t-sectors">'+sectH+'</div></div>'
-    +prodH
-    +'<div class="t-sec"><div class="t-sl">Personal a Cargo</div><div class="t-ops">'+opsH+'</div></div>'
-    +'<div class="t-sec"><div class="t-sl">Medidas de Seguridad</div>'
-    +'<div class="t-alert"><div class="t-at">&#9940; Protocolo de Seguridad Activo</div>'
-    +'<ul><li>Senalizacion con carteleria en todos los ingresos a los sectores afectados.</li>'
-    +'<li>Control de presencia de Fosfina (PH3) en el interior y medicion de concentracion en los encarpados.</li>'
-    +'<li>Queda ESTRICTAMENTE PROHIBIDO circular o ingresar dentro del perimetro senalizado.</li>'
-    +'<li>En la Porteria N&deg; 1 y N&deg; 2 se dejaran las hojas de datos de seguridad.</li></ul>'
-    +'<div class="t-badge">&#9940; Zona Restringida &middot; No ingresar</div></div></div>'
-    +'<div class="t-sec"><div class="t-sl">Cronograma</div><div class="t-tl">'
-    +'<div class="t-tli"><div class="t-dot a">&#128640;</div><div class="t-tlc"><div class="t-tld">'+fmtDate(fi)+' - '+hf+' hs</div><div class="t-tldesc">Inicio de fumigacion. Sellado y senalizacion de sectores.</div></div></div>'
-    +'<div class="t-tli"><div class="t-dot">&#128274;</div><div class="t-tlc"><div class="t-tld">'+(fl?fmtDate(fl):"-")+'</div><div class="t-tldesc">Liberacion de los sectores fumigados.</div></div></div>'
-    +'<div class="t-tli"><div class="t-dot e">&#9989;</div><div class="t-tlc"><div class="t-tld">'+(fr?fmtDate(fr):"-")+' - '+hrf+' hs</div><div class="t-tldesc">Reinicio de actividades (previo a mediciones confirmadas).</div></div></div>'
-    +'</div></div>'
-    +'<div class="t-sec"><div class="t-sl">Contactos ante Dudas o Emergencias</div><div class="t-cts">'+ctsH+'</div></div>'
-    +'<div class="t-ftr"><span class="t-ft">Generado: '+fmtDate(new Date().toISOString().slice(0,10))+' &middot; '+tNum+'</span>'
-    +'<div class="t-st"><div class="t-dot-pulse"></div> Activo</div></div>'
-    +'</div>';
-  document.getElementById("previewArea").innerHTML=html;
-  document.getElementById("btnSend").disabled=false;
-  document.getElementById("btnPDF").disabled=false;
-  ticketReady=true;
+  // Contactos
+  var cts = [{n:'Pereyra Isaias Ezequiel',p:'358 514-5055'},{n:'Gutierrez Franco',p:'358 487-4894'},{n:'Mayra Dip',p:'349 341-8445'}];
+  var ctsH = cts.map(function(c){
+    return '<div class="t-ct"><div class="t-cn">'+c.n+'</div><div class="t-cp">&#128222; '+c.p+'</div></div>';
+  }).join('');
+
+  var html =
+    '<div class="ticket">' +
+    '<div class="t-hdr"><img src="data:image/jpeg;base64,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" alt="Maniagro" style="height:32px;width:auto;border-radius:2px;"/><span class="t-id">'+tNum+'</span></div>' +
+    '<div class="t-ttl"><div class="t-icon">&#9888;&#65039;</div><div class="t-ttl-txt"><h2>AVISO DE FUMIGACION</h2><p>Notificacion oficial &middot; Difusion inmediata a todo el personal</p></div></div>' +
+    '<div class="t-meta">' +
+      '<div class="t-mi"><div class="t-ml">Fecha</div><div class="t-mv">'+fmtD(fi)+'</div></div>' +
+      '<div class="t-mi"><div class="t-ml">Hora</div><div class="t-mv red">'+hf+' hs</div></div>' +
+      '<div class="t-mi"><div class="t-ml">Estado</div><div class="t-mv red">&#9888; Activo</div></div>' +
+    '</div>' +
+    '<div class="t-sec"><div class="t-sl">Descripcion de la Operacion</div>' +
+      '<p class="t-desc">El dia <strong>'+fmtL(fi)+'</strong>, a partir de las <strong>'+hf+' hs</strong>, se daran inicio las actividades de <strong>fumigacion</strong> en los sectores indicados. Se solicita difusion inmediata a todo el personal.</p>' +
+    '</div>' +
+    '<div class="t-sec"><div class="t-sl">Sectores Afectados</div><div class="t-sectors">'+sectH+'</div></div>' +
+    pBlock +
+    '<div class="t-sec"><div class="t-sl">Personal a Cargo</div><div class="t-ops">'+opsH+'</div></div>' +
+    '<div class="t-sec"><div class="t-sl">Medidas de Seguridad</div>' +
+      '<div class="t-alert"><div class="t-at">&#9940; Protocolo de Seguridad Activo</div>' +
+        '<ul>' +
+          '<li>Senalizacion con carteleria en todos los ingresos a los sectores afectados.</li>' +
+          '<li>Control de presencia de Fosfina (PH3) en el interior y medicion de concentracion en los encarpados.</li>' +
+          '<li>Queda ESTRICTAMENTE PROHIBIDO circular o ingresar dentro del perimetro senalizado.</li>' +
+          '<li>En la Porteria N&deg; 1 y N&deg; 2 se dejaran las hojas de datos de seguridad.</li>' +
+        '</ul>' +
+        '<div class="t-badge">&#9940; Zona Restringida &middot; No ingresar</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="t-sec"><div class="t-sl">Cronograma</div><div class="t-tl">' +
+      '<div class="t-tli"><div class="t-dot a">&#128640;</div><div class="t-tlc"><div class="t-tld">'+fmtD(fi)+' - '+hf+' hs</div><div class="t-tlds">Inicio de fumigacion. Sellado y senalizacion de sectores.</div></div></div>' +
+      '<div class="t-tli"><div class="t-dot">&#128274;</div><div class="t-tlc"><div class="t-tld">'+(fl?fmtD(fl):'-')+'</div><div class="t-tlds">Liberacion de los sectores fumigados.</div></div></div>' +
+      '<div class="t-tli"><div class="t-dot e">&#9989;</div><div class="t-tlc"><div class="t-tld">'+(fr?fmtD(fr):'-')+' - '+hrf+' hs</div><div class="t-tlds">Reinicio de actividades (previo a mediciones confirmadas).</div></div></div>' +
+    '</div></div>' +
+    '<div class="t-sec"><div class="t-sl">Contactos ante Dudas o Emergencias</div><div class="t-cts">'+ctsH+'</div></div>' +
+    '<div class="t-ftr"><span class="t-ft">Generado: '+fmtD(new Date().toISOString().slice(0,10))+' &middot; '+tNum+'</span><div class="t-st"><div class="t-pulse"></div> Activo</div></div>' +
+    '</div>';
+
+  document.getElementById('previewArea').innerHTML = html;
+  document.getElementById('btnSend').disabled = false;
+  document.getElementById('btnPDF').disabled  = false;
+  ticketOK = true;
 }
 
 // TOAST
-function toast(msg,col){
-  var t=document.getElementById("toast");
-  t.textContent=msg; t.style.background=col||"#1a8a4a"; t.style.display="block";
-  setTimeout(function(){ t.style.display="none"; },4000);
+function showToast(msg, col) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = col || '#1a8a4a';
+  t.style.display = 'block';
+  setTimeout(function(){ t.style.display='none'; }, 4000);
 }
 
-// SEND EMAIL
-async function sendEmail(){
-  if(!ticketReady){ alert("Primero genera el ticket."); return; }
-  var all=getAllEmails();
-  if(!all.length){ alert("Selecciona al menos un destinatario."); return; }
-  if(EJS_PUBLIC_KEY==="TU_PUBLIC_KEY"){ alert("Configura las credenciales de EmailJS primero."); return; }
-  var fi=document.getElementById("fi").value;
-  var hi=document.getElementById("hi").value;
-  var fl=document.getElementById("fl").value;
-  var fr=document.getElementById("fr").value;
-  var hr=document.getElementById("hr").value;
-  var prod=document.getElementById("producto").value.trim();
-  var lots=document.getElementById("lotes").value.trim();
-  var tNum=getNum();
-  var sects=selSectors.map(function(s){ return "  - "+s; }).join("\n");
-  var body="Estimado/a equipo,\n\n"
-    +"Se informa que el dia "+fmtLong(fi)+", a partir de las "+hi.slice(0,5)+" hs, "
-    +"comenzaran las actividades de FUMIGACION CON FOSFURO DE ALUMINIO en planta.\n\n"
-    +"TICKET: "+tNum+"\n"
-    +"----------------------------------------\n\n"
-    +"SECTORES AFECTADOS:\n"+sects+"\n"
-    +(prod?"\nTIPO DE PRODUCTO: "+prod:"")
-    +(lots?"\nLOTE/S:          "+lots:"")
-    +"\n\nPERSONAL A CARGO:\n  - Ezequiel Pereyra\n  - Franco Gutierrez\n\n"
-    +"MEDIDAS DE SEGURIDAD:\n"
-    +"  - Senalizacion con carteleria en todos los ingresos.\n"
-    +"  - Control de presencia de Fosfina (PH3) y medicion de concentracion.\n"
-    +"  - PROHIBIDO circular o ingresar dentro del perimetro senalizado.\n"
-    +"  - En la Porteria N1 y N2 se dejaran las hojas de datos de seguridad.\n\n"
-    +"CRONOGRAMA:\n"
-    +"  Inicio:     "+fmtDate(fi)+" a las "+hi.slice(0,5)+" hs\n"
-    +"  Liberacion: "+(fl?fmtDate(fl):"-")+"\n"
-    +"  Reinicio:   "+(fr?fmtDate(fr):"-")+" a las "+hr.slice(0,5)+" hs\n"
-    +"  (previo a mediciones de concentracion confirmadas)\n\n"
-    +"----------------------------------------\n"
-    +"CONTACTOS:\n"
-    +"  Pereyra Isaias Ezequiel: 358 514-5055\n"
-    +"  Gutierrez Franco:        358 487-4894\n"
-    +"  Mayra Dip:               349 341-8445\n\n"
-    +"Se solicita comunicar a TODO el personal.\n\n"
-    +"Saludos,\nDepto. Sanidad & Seguridad - Maniagro Argentina";
-  var btn=document.getElementById("btnSend");
-  btn.disabled=true; btn.textContent="Enviando...";
-  try{
-    await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_ID, {
-      to_emails: all.map(function(e){ return e.addr; }).join(","),
-      from_name: "Maniagro Argentina - Sanidad & Seguridad",
-      reply_to:  "mdip@maniagro.com",
-      subject:   tNum+" | Aviso de Fumigacion - "+fmtDate(fi),
-      message:   body
-    });
-    toast("Mail enviado correctamente","#1a8a4a");
-  }catch(err){
-    console.error(err);
-    toast("EmailJS fallo - abriendo cliente de correo...","#e6a800");
-    setTimeout(function(){
-      var to=all.map(function(e){ return e.addr; }).join(",");
-      window.location.href="mailto:"+to+"?subject="+encodeURIComponent(tNum+" | Aviso de Fumigacion - "+fmtDate(fi))+"&body="+encodeURIComponent(body);
-    },1500);
-  }finally{
-    btn.disabled=false; btn.innerHTML="&#9993; Enviar por Mail";
-  }
+// SEND GMAIL - Descarga PDF y abre Gmail con destinatarios + asunto + cuerpo
+function sendGmail() {
+  if (!ticketOK) { alert('Primero genera el ticket.'); return; }
+  var all = allEmails();
+  if (!all.length) { alert('Selecciona al menos un destinatario.'); return; }
+
+  var fi  = document.getElementById('fi').value;
+  var hi  = document.getElementById('hi').value;
+  var fl  = document.getElementById('fl').value;
+  var fr  = document.getElementById('fr').value;
+  var hr  = document.getElementById('hr').value;
+  var prd = document.getElementById('producto').value.trim();
+  var lot = document.getElementById('lotes').value.trim();
+  var qim = document.getElementById('quimico').value.trim();
+  var tNum = getNum();
+  var hf   = hi.slice(0,5);
+  var hrf  = hr.slice(0,5);
+  var fromAcc = document.getElementById('fromAccount').value;
+
+  // Guardar preferencia de cuenta
+  try { localStorage.setItem('fum_from_account', fromAcc); } catch(e) {}
+
+  var sectList = selSectors.map(function(s){ return '  - '+s; }).join('\n');
+  var prodLines = '';
+  if (prd) prodLines += '\nTIPO/S DE PRODUCTO: ' + prd;
+  if (lot) prodLines += '\nLOTE/S:             ' + lot;
+  if (qim) prodLines += '\nQUIMICO/S:          ' + qim;
+
+  var body = [
+    'Estimado/a equipo,',
+    '',
+    'Se informa que el dia ' + fmtL(fi) + ', a partir de las ' + hf + ' hs, comenzaran las actividades de FUMIGACION en planta.',
+    '',
+    'TICKET: ' + tNum,
+    '(Se adjunta PDF con el detalle completo)',
+    '--------------------------------------------',
+    '',
+    'SECTORES AFECTADOS:',
+    sectList + (prodLines ? prodLines : ''),
+    '',
+    'PERSONAL A CARGO:',
+    '  - Ezequiel Pereyra',
+    '  - Franco Gutierrez',
+    '',
+    'MEDIDAS DE SEGURIDAD:',
+    '  - Senalizacion con carteleria en todos los ingresos.',
+    '  - Control de presencia de Fosfina (PH3) y medicion de concentracion.',
+    '  - PROHIBIDO circular o ingresar dentro del perimetro senalizado.',
+    '  - En la Porteria N 1 y N 2 se dejaran las hojas de datos de seguridad.',
+    '',
+    'CRONOGRAMA:',
+    '  Inicio:     ' + fmtD(fi) + ' a las ' + hf + ' hs',
+    '  Liberacion: ' + (fl ? fmtD(fl) : '-'),
+    '  Reinicio:   ' + (fr ? fmtD(fr) : '-') + ' a las ' + hrf + ' hs',
+    '  (previo a mediciones de concentracion confirmadas)',
+    '',
+    '--------------------------------------------',
+    'CONTACTOS:',
+    '  Pereyra Isaias Ezequiel: 358 514-5055',
+    '  Gutierrez Franco:        358 487-4894',
+    '  Mayra Dip:               349 341-8445',
+    '',
+    'Se solicita comunicar a TODO el personal.',
+    '',
+    'Saludos,',
+    'Depto. Sanidad & Seguridad - Maniagro Argentina'
+  ].join('\n');
+
+  var subject = tNum + ' | Aviso de Fumigacion - ' + fmtD(fi);
+  var toList  = all.map(function(e){ return e.a; }).join(',');
+
+  // 1) Disparar descarga del PDF (ticket.html -> el usuario hace "Guardar como PDF")
+  dlPDF();
+
+  // 2) Construir URL de Gmail compose con la cuenta remitente elegida
+  //    authuser=<email> le indica a Gmail cual de las cuentas logueadas usar
+  var gmailURL = 'https://mail.google.com/mail/?view=cm&fs=1'
+    + '&authuser=' + encodeURIComponent(fromAcc)
+    + '&to='       + encodeURIComponent(toList)
+    + '&su='       + encodeURIComponent(subject)
+    + '&body='     + encodeURIComponent(body);
+
+  // 3) Abrir Gmail en pestana nueva (pequeno delay para que la descarga arranque primero)
+  showToast('Descargando PDF y abriendo Gmail (' + fromAcc + ')...', '#1a8a4a');
+  setTimeout(function(){
+    var w = window.open(gmailURL, '_blank');
+    if (!w) {
+      alert('El navegador bloqueo la ventana emergente. Permiti pop-ups para este sitio e intenta de nuevo.');
+    }
+  }, 600);
 }
 
-// PDF
-function dlPDF(){
-  if(!ticketReady){ alert("Primero genera el ticket."); return; }
-  var ticket=document.getElementById("previewArea").querySelector(".ticket");
-  if(!ticket){ alert("No se encontro el ticket."); return; }
-  var win=window.open("","_blank","width=820,height=960");
-  if(!win){ alert("El navegador bloqueo la ventana. Permitilo e intenta de nuevo."); return; }
-  win.document.write("<!DOCTYPE html><html><head><meta charset=\'UTF-8\'><title>Ticket</title><style>"
-    +"*{box-sizing:border-box;margin:0;padding:0;} body{background:#f5f3ee;font-family:Arial,sans-serif;padding:30px;}"
-    +"@media print{body{padding:0;background:#fff;} .noprint{display:none;}}"
-    +".ticket{background:#fff;border:1.5px solid #d6d0c4;border-radius:4px;overflow:hidden;max-width:680px;margin:0 auto;}"
-    +".t-hdr{background:#1a1a1a;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}"
-    +".t-id{font-size:11px;color:#f0c400;letter-spacing:1px;}"
-    +".t-ttl{padding:20px;border-bottom:2px solid #f0c400;display:flex;gap:14px;align-items:center;justify-content:center;text-align:center;}"
-    +".t-icon{width:44px;height:44px;background:#f0c400;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}"
-    +".t-ttl-txt h2{font-size:20px;font-weight:700;text-transform:uppercase;color:#c0392b;text-align:center;}"
-    +".t-ttl-txt p{font-size:11px;color:#666;margin-top:4px;text-align:center;}"
-    +".t-meta{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #e8e5de;}"
-    +".t-mi{padding:10px 14px;border-right:1px solid #e8e5de;} .t-mi:last-child{border-right:none;}"
-    +".t-ml{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:3px;}"
-    +".t-mv{font-size:12px;font-weight:600;} .t-mv.red{color:#c0392b;}"
-    +".t-sec{padding:14px 20px;border-bottom:1px solid #e8e5de;} .t-sec:last-child{border-bottom:none;}"
-    +".t-sl{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #e8e5de;}"
-    +".t-desc{font-size:12px;line-height:1.6;} .t-desc strong{color:#c0392b;font-weight:700;}"
-    +".t-sectors{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;}"
-    +".t-sector{background:#f5f3ee;border:1.5px solid #d6d0c4;border-left:3px solid #c49f00;padding:5px 8px;font-size:11px;font-weight:600;border-radius:2px;}"
-    +".t-pg{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}"
-    +".t-pi{background:#f5f3ee;border:1.5px solid #d6d0c4;border-left:3px solid #e6a800;padding:6px 10px;border-radius:3px;display:flex;flex-direction:column;gap:2px;}"
-    +".t-pl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#888;} .t-pv{font-size:12px;font-weight:700;}"
-    +".t-ops{display:flex;gap:8px;flex-wrap:wrap;}"
-    +".t-op{background:#f5f3ee;border:1.5px solid #d6d0c4;padding:7px 10px;border-radius:3px;display:flex;align-items:center;gap:8px;}"
-    +".t-av{width:26px;height:26px;background:#1a1a1a;color:#f0c400;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}"
-    +".t-on{font-size:12px;font-weight:600;} .t-or{font-size:10px;color:#666;}"
-    +".t-alert{background:#fdf2f1;border:1.5px solid #e8b4b0;border-left:4px solid #c0392b;border-radius:3px;padding:10px 12px;}"
-    +".t-at{font-size:10px;font-weight:700;color:#c0392b;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;}"
-    +".t-alert ul{list-style:none;display:flex;flex-direction:column;gap:4px;}"
-    +".t-alert li{font-size:11px;color:#7a2020;padding-left:12px;position:relative;line-height:1.4;}"
-    +".t-alert li:before{content:\"\\25B6\";position:absolute;left:0;font-size:8px;top:3px;color:#c0392b;}"
-    +".t-badge{display:inline-block;background:#c0392b;color:#fff;font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:2px;margin-top:5px;text-transform:uppercase;font-weight:700;}"
-    +".t-tl{display:flex;flex-direction:column;}"
-    +".t-tli{display:flex;gap:10px;position:relative;}"
-    +".t-tli:not(:last-child):before{content:\"\";position:absolute;left:10px;top:24px;bottom:-4px;width:1px;background:#e8e5de;}"
-    +".t-dot{width:22px;height:22px;border-radius:50%;border:2px solid #d6d0c4;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:2px;}"
-    +".t-dot.a{background:#f0c400;border-color:#c49f00;} .t-dot.e{background:#edf7f1;border-color:#1a7a4a;}"
-    +".t-tlc{padding:3px 0 14px;} .t-tld{font-size:10px;font-weight:700;} .t-tldesc{font-size:11px;color:#555;margin-top:2px;line-height:1.4;}"
-    +".t-cts{display:flex;flex-direction:column;gap:6px;}"
-    +".t-ct{display:flex;align-items:center;justify-content:space-between;background:#f5f3ee;border:1.5px solid #d6d0c4;padding:7px 10px;border-radius:3px;}"
-    +".t-cn{font-size:12px;font-weight:600;} .t-cp{font-size:11px;color:#555;background:#fff;border:1px solid #d6d0c4;padding:2px 7px;border-radius:20px;}"
-    +".t-ftr{background:#f5f3ee;border-top:1px solid #d6d0c4;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;}"
-    +".t-ft{font-size:9px;color:#888;letter-spacing:1px;}"
-    +".t-st{display:flex;align-items:center;gap:5px;background:#fff3cd;border:1px solid #f0c400;border-radius:20px;padding:2px 10px;font-size:9px;font-weight:700;color:#7a5c00;letter-spacing:1px;text-transform:uppercase;}"
-    +"</style></head><body>"
-    +ticket.outerHTML
-    +'<div class="noprint" style="text-align:center;margin:20px auto 0;max-width:680px;">'
-    +'<button onclick="window.print()" style="margin-top:16px;padding:10px 28px;background:#1a1a1a;color:#f0c400;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;">Imprimir / Guardar PDF</button>'
-    +"</div></body></html>");
-  win.document.close();
-  win.onload=function(){ setTimeout(function(){ try{ win.print(); }catch(e){} },1200); };
-  setTimeout(function(){ try{ if(win&&!win.closed) win.print(); }catch(e){} },2500);
-}
+// PDF - uses blob to avoid any string escaping issues
+function dlPDF() {
+  if (!ticketOK) { alert('Primero genera el ticket.'); return; }
+  var ticket = document.getElementById('previewArea').querySelector('.ticket');
+  if (!ticket) { alert('No se encontro el ticket.'); return; }
 
+  var ticketHTML = ticket.outerHTML;
+  var css = document.querySelector('style').textContent;
+
+  var fullHTML = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>'
+    + '<title>Ticket Fumigacion</title>'
+    + '<style>' + css + '.no-print{text-align:center;margin:20px auto;max-width:680px;} @media print{.no-print{display:none;} body{padding:0;background:#fff;}}</style>'
+    + '</head><body style="background:#f5f3ee;font-family:Arial,sans-serif;padding:30px;">'
+    + '<div style="max-width:680px;margin:0 auto;">' + ticketHTML + '</div>'
+    + '<div class="no-print"><button onclick="window.print()" style="margin-top:16px;padding:10px 28px;background:#1a1a1a;color:#f0c400;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;">Imprimir / Guardar PDF</button></div>'
+    + '</body></html>';
+
+  var blob = new Blob([fullHTML], { type: 'text/html' });
+  var url  = URL.createObjectURL(blob);
+  var win  = window.open(url, '_blank');
+  if (!win) { alert('El navegador bloqueo la ventana. Permitilo e intenta de nuevo.'); return; }
+  win.onload = function() { setTimeout(function(){ try{ win.print(); }catch(e){} }, 800); };
+}
 </script>
 </body>
 </html>
