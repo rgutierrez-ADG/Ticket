@@ -301,12 +301,21 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
     </div>
   </div>
 
+  <!-- ESTADO DE ARCHIVADO EN DRIVE -->
+  <div class="form-section">
+    <div class="sec-lbl">Archivado en Drive</div>
+    <div id="cfgStatus" style="font-size:11px;color:var(--text3);padding:9px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;"></div>
+  </div>
+
   <button class="btn-gen"  onclick="genTicket()">&#9881; Generar Vista Previa</button>
-  <button class="btn-send" id="btnSend" onclick="sendGmail()" disabled>&#9993; Descargar PDF y Abrir Gmail</button>
+  <button class="btn-send" id="btnSend" onclick="sendGmail()" disabled>&#9993; Archivar en Drive y Abrir Gmail</button>
   <button class="btn-pdf"  id="btnPDF"  onclick="dlPDF()"    disabled>&#11015; Solo Descargar PDF</button>
+  <div id="progressBox" style="display:none;margin-top:10px;padding:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;font-size:11px;">
+    <div id="progressTxt" style="color:var(--text2);"></div>
+  </div>
   <div style="margin-top:8px;font-size:10px;color:var(--text3);line-height:1.5;text-align:center;">
-    Al enviar: el PDF se descarga, el cuerpo del mail se copia al portapapeles con formato y se abre Gmail.<br>
-    En Gmail, hacé <b>Ctrl+V</b> en el cuerpo del mensaje para pegar con formato, y adjuntá el PDF descargado.
+    Si hay Apps Script configurado: asigna N° correlativo, guarda el PDF en Drive y lo registra en la lista maestra.<br>
+    Después abre Gmail. Hacé <b>Ctrl+V</b> en el cuerpo del mensaje y adjuntá el PDF descargado.
   </div>
 </div>
 
@@ -346,6 +355,41 @@ var selEmails   = [];
 var extraEmails = [];
 var ticketOK    = false;
 var ticketCtr   = Math.floor(Math.random()*900)+100;
+
+// Configuración Apps Script (hardcodeada - no se puede modificar desde la UI)
+var APPS_SCRIPT_URL    = 'https://script.google.com/macros/s/AKfycbxvzbxOD-FS2o0AKtQ-qYbRv5A4F5F9Qi67fl5Rcce2tml-XQBt1d8bEEVk_BLyggw/exec';
+var APPS_SCRIPT_SECRET = 'ADG-SGCIA-2026';
+
+function toggleCfg() {
+  var p = document.getElementById('cfgPanel');
+  var ic = document.getElementById('cfgToggleIcon');
+  var open = p.style.display === 'none';
+  p.style.display = open ? 'block' : 'none';
+  ic.textContent = open ? '▲' : '▼';
+}
+
+function loadCfg() {
+  // Config hardcodeada - solo actualiza el status visual
+  updateCfgStatus();
+}
+
+function updateCfgStatus() {
+  var st = document.getElementById('cfgStatus');
+  if (!st) return;
+  if (APPS_SCRIPT_URL && APPS_SCRIPT_SECRET) {
+    st.innerHTML = '<span style="color:#1a8a4a;font-weight:700;">✓ Archivado activo</span> · Los tickets se guardan automáticamente en Drive y en la Lista Maestra';
+  } else {
+    st.innerHTML = '<span style="color:#c49f00;font-weight:700;">⚠ Sin configurar</span>';
+  }
+}
+
+function showProgress(txt) {
+  var box = document.getElementById('progressBox');
+  var t   = document.getElementById('progressTxt');
+  if (txt === null) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  t.innerHTML = txt;
+}
 
 var EDATA = [
   {n:'Emilse Eroles',          a:'eeroles@maniagro.com'},
@@ -393,6 +437,8 @@ window.onload = function() {
       }
     }
   } catch(e) {}
+  // Cargar configuración de Apps Script
+  loadCfg();
   document.addEventListener('click', function(ev) {
     closePanelIfOutside('sPanel','sTrig', ev);
     closePanelIfOutside('ePanel','eTrig', ev);
@@ -603,7 +649,7 @@ function showToast(msg, col) {
   setTimeout(function(){ t.style.display='none'; }, 4000);
 }
 
-// SEND GMAIL - Descarga PDF y abre Gmail con destinatarios + asunto + cuerpo
+// SEND GMAIL - Archiva en Drive (si hay AS config), descarga PDF, copia al clipboard, abre Gmail
 async function sendGmail() {
   if (!ticketOK) { alert('Primero generá el ticket.'); return; }
   var all = allEmails();
@@ -617,7 +663,6 @@ async function sendGmail() {
   var prd = document.getElementById('producto').value.trim();
   var lot = document.getElementById('lotes').value.trim();
   var qim = document.getElementById('quimico').value.trim();
-  var tNum = getNum();
   var hf   = hi.slice(0,5);
   var hrf  = hr.slice(0,5);
   var fromAcc = document.getElementById('fromAccount').value;
@@ -625,133 +670,212 @@ async function sendGmail() {
   // Guardar preferencia de cuenta
   try { localStorage.setItem('fum_from_account', fromAcc); } catch(e) {}
 
-  var sectList = selSectors.map(function(s){ return '  - '+s; }).join('\n');
-  var prodLines = '';
-  if (prd) prodLines += '\nTIPO/S DE PRODUCTO: ' + prd;
-  if (lot) prodLines += '\nLOTE/S:             ' + lot;
-  if (qim) prodLines += '\nQUÍMICO/S:          ' + qim;
+  var btnSend = document.getElementById('btnSend');
+  var btnPDF  = document.getElementById('btnPDF');
+  var prevSendTxt = btnSend.innerHTML;
+  btnSend.disabled = true;
+  btnPDF.disabled  = true;
 
-  // Body TEXTO PLANO (fallback para Gmail URL)
-  var bodyPlain = [
-    'Estimado/a equipo,',
-    '',
-    'Se informa que el día ' + fmtL(fi) + ', a partir de las ' + hf + ' hs, comenzarán las actividades de FUMIGACIÓN en planta.',
-    '',
-    'TICKET: ' + tNum,
-    '(Se adjunta PDF con el detalle completo)',
-    '--------------------------------------------',
-    '',
-    'SECTORES AFECTADOS:',
-    sectList + (prodLines ? prodLines : ''),
-    '',
-    'PERSONAL A CARGO:',
-    '  - Ezequiel Pereyra',
-    '  - Franco Gutierrez',
-    '',
-    'MEDIDAS DE SEGURIDAD:',
-    '  - Señalización con cartelería en todos los ingresos.',
-    '  - Control de presencia de Fosfina (PH3) y medición de concentración.',
-    '  - PROHIBIDO circular o ingresar dentro del perímetro señalizado.',
-    '  - En la Portería N.° 1 y N.° 2 se dejarán las hojas de datos de seguridad.',
-    '',
-    'CRONOGRAMA:',
-    '  Inicio:     ' + fmtD(fi) + ' a las ' + hf + ' hs',
-    '  Liberación: ' + (fl ? fmtD(fl) : '-'),
-    '  Reinicio:   ' + (fr ? fmtD(fr) : '-') + ' a las ' + hrf + ' hs',
-    '  (previo a mediciones de concentración confirmadas)',
-    '',
-    '--------------------------------------------',
-    'CONTACTOS:',
-    '  Pereyra Isaias Ezequiel: 358 514-5055',
-    '  Gutierrez Franco:        358 487-4894',
-    '  Mayra Dip:               349 341-8445',
-    '',
-    'Se solicita comunicar a TODO el personal.',
-    '',
-    'Saludos,',
-    'Depto. Sanidad & Seguridad - Maniagro Argentina'
-  ].join('\n');
+  try {
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 1: Build del PDF (con el número actual - puede cambiar si hay AS)
+    // ═════════════════════════════════════════════════════════════════════
+    showProgress('⚙ Generando PDF…');
+    btnSend.innerHTML = 'Procesando…';
+    var built = await buildPDF();
 
-  // Body HTML (rich text) para pegar en Gmail con Ctrl+V
-  // Colores y negritas replicando el formato de la plantilla oficial
-  var RED  = '#c0392b';
-  var DARK = '#1a1e26';
-  var sectHTML = selSectors.map(function(s){ return '&nbsp;&nbsp;- ' + escHTML(s); }).join('<br>');
-  var prodHTML = '';
-  if (prd) prodHTML += '<b>TIPO/S DE PRODUCTO:</b> ' + escHTML(prd) + '<br>';
-  if (lot) prodHTML += '<b>LOTE/S:</b> ' + escHTML(lot) + '<br>';
-  if (qim) prodHTML += '<b>QUÍMICO/S:</b> ' + escHTML(qim) + '<br>';
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 2: Archivar en Drive vía Apps Script (si está configurado)
+    //         El AS asigna el número correlativo REAL, que puede diferir del local
+    // ═════════════════════════════════════════════════════════════════════
+    var assignedTicketNum = getNum();  // por defecto, el local
+    var archiveResult = null;
 
-  var bodyHTML =
-    '<div style="font-family:Arial,sans-serif;font-size:13px;color:' + DARK + ';line-height:1.55;">' +
-      '<p style="margin:0 0 10px 0;"><b>Estimado/a equipo</b>,</p>' +
-      '<p style="margin:0 0 10px 0;">Se informa que el día <b style="color:' + RED + ';">' + fmtL(fi) + '</b>, a partir de las <b style="color:' + RED + ';">' + hf + ' hs</b>, comenzarán las actividades de <b style="color:' + RED + ';">FUMIGACIÓN</b> en planta.</p>' +
-      '<p style="margin:0 0 4px 0;">TICKET: ' + escHTML(tNum) + '</p>' +
-      '<p style="margin:0 0 10px 0;color:#666;font-size:12px;">(Se adjunta PDF con el detalle completo)</p>' +
-      '<hr style="border:none;border-top:1px solid #ccc;margin:12px 0;">' +
-      '<p style="margin:0 0 6px 0;"><b>SECTORES AFECTADOS:</b></p>' +
-      '<p style="margin:0 0 10px 0;">' + sectHTML + '</p>' +
-      (prodHTML ? '<p style="margin:0 0 10px 0;">' + prodHTML + '</p>' : '') +
-      '<p style="margin:0 0 6px 0;"><b>PERSONAL A CARGO:</b></p>' +
-      '<p style="margin:0 0 10px 0;">&nbsp;&nbsp;- Ezequiel Pereyra<br>&nbsp;&nbsp;- Franco Gutierrez</p>' +
-      '<p style="margin:0 0 6px 0;"><b>MEDIDAS DE SEGURIDAD:</b></p>' +
-      '<ul style="margin:0 0 10px 0;padding-left:22px;">' +
-        '<li>Señalización con cartelería en todos los ingresos.</li>' +
-        '<li>Control de presencia de Fosfina (PH3) y medición de concentración.</li>' +
-        '<li><b style="color:' + RED + ';">PROHIBIDO circular o ingresar dentro del perímetro señalizado.</b></li>' +
-        '<li>En la Portería N.° 1 y N.° 2 se dejarán las hojas de datos de seguridad.</li>' +
-      '</ul>' +
-      '<p style="margin:0 0 6px 0;"><b>CRONOGRAMA:</b></p>' +
-      '<p style="margin:0 0 10px 0;font-family:Consolas,Monaco,monospace;font-size:12px;">' +
-        '&nbsp;&nbsp;Inicio:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + fmtD(fi) + ' a las ' + hf + ' hs<br>' +
-        '&nbsp;&nbsp;Liberación:&nbsp;&nbsp;' + (fl ? fmtD(fl) : '-') + '<br>' +
-        '&nbsp;&nbsp;Reinicio:&nbsp;&nbsp;&nbsp;&nbsp;' + (fr ? fmtD(fr) : '-') + ' a las ' + hrf + ' hs<br>' +
-        '&nbsp;&nbsp;<span style="color:#666;">(previo a mediciones de concentración confirmadas)</span>' +
-      '</p>' +
-      '<hr style="border:none;border-top:1px solid #ccc;margin:12px 0;">' +
-      '<p style="margin:0 0 6px 0;"><b>CONTACTOS:</b></p>' +
-      '<p style="margin:0 0 10px 0;">' +
-        '&nbsp;&nbsp;Pereyra Isaias Ezequiel: 358 514-5055<br>' +
-        '&nbsp;&nbsp;Gutierrez Franco:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;358 487-4894<br>' +
-        '&nbsp;&nbsp;Mayra Dip:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;349 341-8445' +
-      '</p>' +
-      '<p style="margin:0 0 10px 0;"><b>Se solicita comunicar a <span style="color:' + RED + ';">TODO</span> el personal.</b></p>' +
-      '<p style="margin:0;">Saludos,<br><span style="color:#666;font-size:12px;">Depto. Sanidad &amp; Seguridad - Maniagro Argentina</span></p>' +
-    '</div>';
+    if (APPS_SCRIPT_URL && APPS_SCRIPT_SECRET) {
+      showProgress('☁ Archivando en Drive y asignando N° correlativo…');
+      var pdfBase64 = pdfToBase64(built.pdf);
+      var ticketData = {
+        fechaInicio:     fi,
+        horaInicio:      hf,
+        fechaLiberacion: fl,
+        fechaReinicio:   fr,
+        horaReinicio:    hrf,
+        sectores:        selSectors,
+        producto:        prd,
+        lote:            lot,
+        quimico:         qim,
+        generadoPor:     fromAcc,
+        destinatarios:   all.map(function(e){ return e.a; }).join('; ')
+      };
+      archiveResult = await archiveToDrive(pdfBase64, ticketData);
 
-  var subject = tNum + ' | Aviso de Fumigación - ' + fmtD(fi);
-  var toList  = all.map(function(e){ return e.a; }).join(',');
-
-  // 1) Generar y descargar el PDF primero
-  await dlPDF();
-
-  // 2) Copiar HTML al portapapeles (rich text) para que el usuario pegue con Ctrl+V en Gmail
-  var copyOK = await copyRichTextToClipboard(bodyHTML, bodyPlain);
-
-  // 3) Construir URL de Gmail compose con la cuenta remitente elegida
-  //    authuser=<email> le indica a Gmail cual de las cuentas logueadas usar
-  //    Dejamos el body VACIO a propósito: el usuario pega con Ctrl+V el rich text
-  var gmailURL = 'https://mail.google.com/mail/?view=cm&fs=1'
-    + '&authuser=' + encodeURIComponent(fromAcc)
-    + '&to='       + encodeURIComponent(toList)
-    + '&su='       + encodeURIComponent(subject);
-
-  // Si no se pudo copiar al clipboard, incluir body como texto plano (fallback)
-  if (!copyOK) {
-    gmailURL += '&body=' + encodeURIComponent(bodyPlain);
-  }
-
-  // 4) Abrir Gmail en pestana nueva
-  var msg = copyOK
-    ? 'PDF descargado. Gmail abierto. Pegá el cuerpo con Ctrl+V'
-    : 'PDF descargado. Gmail abierto (formato texto plano).';
-  showToast(msg, '#1a8a4a');
-  setTimeout(function(){
-    var w = window.open(gmailURL, '_blank');
-    if (!w) {
-      alert('El navegador bloqueó la ventana emergente. Permití pop-ups para este sitio e intentá de nuevo.');
+      if (archiveResult && archiveResult.ok) {
+        // Actualizar el número con el asignado oficialmente
+        assignedTicketNum = '#' + archiveResult.ticketNum;
+        document.getElementById('ticketNum').textContent = assignedTicketNum;
+        // Regenerar la vista previa con el nuevo número y reconstruir el PDF
+        genTicket();
+        showProgress('⚙ Regenerando PDF con N° oficial ' + assignedTicketNum + '…');
+        built = await buildPDF();
+      } else {
+        // Archivado falló - se sigue sin archivado pero se avisa
+        var errMsg = (archiveResult && archiveResult.error) || 'Servidor no disponible';
+        showProgress('⚠ No se pudo archivar en Drive: ' + escHTML(errMsg) + '<br>Continuando con descarga local…');
+        await new Promise(function(r){ setTimeout(r, 1500); });
+      }
+    } else {
+      showProgress('ℹ Apps Script no configurado. Solo descarga local (sin archivado).');
+      await new Promise(function(r){ setTimeout(r, 800); });
     }
-  }, 300);
+
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 3: Construir cuerpo del mail (con el número final)
+    // ═════════════════════════════════════════════════════════════════════
+    var tNum = assignedTicketNum;
+    var sectList = selSectors.map(function(s){ return '  - '+s; }).join('\n');
+    var prodLines = '';
+    if (prd) prodLines += '\nTIPO/S DE PRODUCTO: ' + prd;
+    if (lot) prodLines += '\nLOTE/S:             ' + lot;
+    if (qim) prodLines += '\nQUÍMICO/S:          ' + qim;
+
+    var bodyPlain = [
+      'Estimado/a equipo,',
+      '',
+      'Se informa que el día ' + fmtL(fi) + ', a partir de las ' + hf + ' hs, comenzarán las actividades de FUMIGACIÓN en planta.',
+      '',
+      'TICKET: ' + tNum,
+      '(Se adjunta PDF con el detalle completo)',
+      '--------------------------------------------',
+      '',
+      'SECTORES AFECTADOS:',
+      sectList + (prodLines ? prodLines : ''),
+      '',
+      'PERSONAL A CARGO:',
+      '  - Ezequiel Pereyra',
+      '  - Franco Gutierrez',
+      '',
+      'MEDIDAS DE SEGURIDAD:',
+      '  - Señalización con cartelería en todos los ingresos.',
+      '  - Control de presencia de Fosfina (PH3) y medición de concentración.',
+      '  - PROHIBIDO circular o ingresar dentro del perímetro señalizado.',
+      '  - En la Portería N.° 1 y N.° 2 se dejarán las hojas de datos de seguridad.',
+      '',
+      'CRONOGRAMA:',
+      '  Inicio:     ' + fmtD(fi) + ' a las ' + hf + ' hs',
+      '  Liberación: ' + (fl ? fmtD(fl) : '-'),
+      '  Reinicio:   ' + (fr ? fmtD(fr) : '-') + ' a las ' + hrf + ' hs',
+      '  (previo a mediciones de concentración confirmadas)',
+      '',
+      '--------------------------------------------',
+      'CONTACTOS:',
+      '  Pereyra Isaias Ezequiel: 358 514-5055',
+      '  Gutierrez Franco:        358 487-4894',
+      '  Mayra Dip:               349 341-8445',
+      '',
+      'Se solicita comunicar a TODO el personal.',
+      '',
+      'Saludos,',
+      'Depto. Sanidad & Seguridad - Maniagro Argentina'
+    ].join('\n');
+
+    var RED  = '#c0392b';
+    var DARK = '#1a1e26';
+    var sectHTML = selSectors.map(function(s){ return '&nbsp;&nbsp;- ' + escHTML(s); }).join('<br>');
+    var prodHTML = '';
+    if (prd) prodHTML += '<b>TIPO/S DE PRODUCTO:</b> ' + escHTML(prd) + '<br>';
+    if (lot) prodHTML += '<b>LOTE/S:</b> ' + escHTML(lot) + '<br>';
+    if (qim) prodHTML += '<b>QUÍMICO/S:</b> ' + escHTML(qim) + '<br>';
+
+    var bodyHTML =
+      '<div style="font-family:Arial,sans-serif;font-size:13px;color:' + DARK + ';line-height:1.55;">' +
+        '<p style="margin:0 0 10px 0;"><b>Estimado/a equipo</b>,</p>' +
+        '<p style="margin:0 0 10px 0;">Se informa que el día <b style="color:' + RED + ';">' + fmtL(fi) + '</b>, a partir de las <b style="color:' + RED + ';">' + hf + ' hs</b>, comenzarán las actividades de <b style="color:' + RED + ';">FUMIGACIÓN</b> en planta.</p>' +
+        '<p style="margin:0 0 4px 0;">TICKET: ' + escHTML(tNum) + '</p>' +
+        '<p style="margin:0 0 10px 0;color:#666;font-size:12px;">(Se adjunta PDF con el detalle completo)</p>' +
+        '<hr style="border:none;border-top:1px solid #ccc;margin:12px 0;">' +
+        '<p style="margin:0 0 6px 0;"><b>SECTORES AFECTADOS:</b></p>' +
+        '<p style="margin:0 0 10px 0;">' + sectHTML + '</p>' +
+        (prodHTML ? '<p style="margin:0 0 10px 0;">' + prodHTML + '</p>' : '') +
+        '<p style="margin:0 0 6px 0;"><b>PERSONAL A CARGO:</b></p>' +
+        '<p style="margin:0 0 10px 0;">&nbsp;&nbsp;- Ezequiel Pereyra<br>&nbsp;&nbsp;- Franco Gutierrez</p>' +
+        '<p style="margin:0 0 6px 0;"><b>MEDIDAS DE SEGURIDAD:</b></p>' +
+        '<ul style="margin:0 0 10px 0;padding-left:22px;">' +
+          '<li>Señalización con cartelería en todos los ingresos.</li>' +
+          '<li>Control de presencia de Fosfina (PH3) y medición de concentración.</li>' +
+          '<li><b style="color:' + RED + ';">PROHIBIDO circular o ingresar dentro del perímetro señalizado.</b></li>' +
+          '<li>En la Portería N.° 1 y N.° 2 se dejarán las hojas de datos de seguridad.</li>' +
+        '</ul>' +
+        '<p style="margin:0 0 6px 0;"><b>CRONOGRAMA:</b></p>' +
+        '<p style="margin:0 0 10px 0;font-family:Consolas,Monaco,monospace;font-size:14px;line-height:1.7;">' +
+          '&nbsp;&nbsp;Inicio:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + fmtD(fi) + ' a las ' + hf + ' hs<br>' +
+          '&nbsp;&nbsp;Liberación:&nbsp;&nbsp;' + (fl ? fmtD(fl) : '-') + '<br>' +
+          '&nbsp;&nbsp;Reinicio:&nbsp;&nbsp;&nbsp;&nbsp;' + (fr ? fmtD(fr) : '-') + ' a las ' + hrf + ' hs<br>' +
+          '&nbsp;&nbsp;<span style="color:#666;font-size:12px;">(previo a mediciones de concentración confirmadas)</span>' +
+        '</p>' +
+        '<hr style="border:none;border-top:1px solid #ccc;margin:12px 0;">' +
+        '<p style="margin:0 0 6px 0;"><b>CONTACTOS:</b></p>' +
+        '<p style="margin:0 0 10px 0;">' +
+          '&nbsp;&nbsp;Pereyra Isaias Ezequiel: 358 514-5055<br>' +
+          '&nbsp;&nbsp;Gutierrez Franco:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;358 487-4894<br>' +
+          '&nbsp;&nbsp;Mayra Dip:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;349 341-8445' +
+        '</p>' +
+        '<p style="margin:0 0 10px 0;"><b>Se solicita comunicar a <span style="color:' + RED + ';">TODO</span> el personal.</b></p>' +
+        '<p style="margin:0;">Saludos,<br><span style="color:#666;font-size:12px;">Depto. Sanidad &amp; Seguridad - Maniagro Argentina</span></p>' +
+      '</div>';
+
+    var subject = tNum + ' | Aviso de Fumigación - ' + fmtD(fi);
+    var toList  = all.map(function(e){ return e.a; }).join(',');
+
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 4: Descargar PDF localmente
+    // ═════════════════════════════════════════════════════════════════════
+    showProgress('⬇ Descargando PDF local…');
+    built.pdf.save(built.filename);
+
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 5: Copiar cuerpo al portapapeles como rich text
+    // ═════════════════════════════════════════════════════════════════════
+    showProgress('📋 Copiando cuerpo al portapapeles…');
+    var copyOK = await copyRichTextToClipboard(bodyHTML, bodyPlain);
+
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 6: Abrir Gmail
+    // ═════════════════════════════════════════════════════════════════════
+    var gmailURL = 'https://mail.google.com/mail/?view=cm&fs=1'
+      + '&authuser=' + encodeURIComponent(fromAcc)
+      + '&to='       + encodeURIComponent(toList)
+      + '&su='       + encodeURIComponent(subject);
+    if (!copyOK) gmailURL += '&body=' + encodeURIComponent(bodyPlain);
+
+    var doneLines = [];
+    if (archiveResult && archiveResult.ok) {
+      doneLines.push('<b style="color:#1a8a4a;">✓ Archivado en Drive:</b> ' + assignedTicketNum);
+      doneLines.push('<a href="' + archiveResult.pdfUrl + '" target="_blank" style="color:#1a8a4a;">Ver PDF en Drive →</a>');
+    }
+    doneLines.push('<b>✓ PDF descargado</b>');
+    doneLines.push(copyOK ? '<b>✓ Cuerpo copiado al portapapeles</b> (pegá con Ctrl+V en Gmail)' : '<b>⚠ Cuerpo NO copiado</b> (se incluye como texto plano)');
+    doneLines.push('<b>✓ Gmail abierto</b> con remitente ' + escHTML(fromAcc));
+    showProgress(doneLines.join('<br>'));
+
+    setTimeout(function(){
+      var w = window.open(gmailURL, '_blank');
+      if (!w) {
+        alert('El navegador bloqueó la ventana emergente. Permití pop-ups para este sitio e intentá de nuevo.');
+      }
+    }, 300);
+
+    // Ocultar progreso después de unos segundos
+    setTimeout(function(){ showProgress(null); }, 8000);
+
+  } catch(err) {
+    console.error('Error en sendGmail:', err);
+    showProgress('✗ Error: ' + escHTML(err.message));
+    alert('Error al procesar: ' + err.message);
+  } finally {
+    btnSend.disabled = false;
+    btnPDF.disabled  = false;
+    btnSend.innerHTML = prevSendTxt;
+  }
 }
 
 // Escape HTML para texto del usuario (sectores, productos, etc.)
@@ -803,82 +927,84 @@ async function copyRichTextToClipboard(html, plain) {
   }
 }
 
-// PDF - genera PDF real con jsPDF + html2canvas (sin headers/footers del navegador)
-// Retorna una Promise para poder encadenar con sendGmail()
+// Construye el PDF con jsPDF y devuelve { pdf, filename } - no descarga
+async function buildPDF() {
+  var ticket = document.getElementById('previewArea').querySelector('.ticket');
+  if (!ticket) throw new Error('No se encontró el ticket en pantalla.');
+
+  // 1) Clonar el ticket a un contenedor offscreen
+  var holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;left:-10000px;top:0;width:800px;background:#ffffff;padding:20px;font-family:Arial,sans-serif;';
+  var clone = ticket.cloneNode(true);
+  clone.style.maxWidth = '760px';
+  clone.style.margin   = '0 auto';
+  holder.appendChild(clone);
+  document.body.appendChild(holder);
+
+  var canvas;
+  try {
+    canvas = await html2canvas(holder, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    });
+  } finally {
+    document.body.removeChild(holder);
+  }
+
+  // 3) Crear PDF A4
+  var jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  var pdf = new jsPDFCtor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  var pageW = pdf.internal.pageSize.getWidth();
+  var pageH = pdf.internal.pageSize.getHeight();
+  var margin = 10;
+  var imgW = pageW - margin * 2;
+  var imgH = canvas.height * imgW / canvas.width;
+  var imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+  if (imgH <= pageH - margin * 2) {
+    pdf.addImage(imgData, 'JPEG', margin, margin, imgW, imgH);
+  } else {
+    var pageContentH = pageH - margin * 2;
+    var sliceHpx = Math.floor(canvas.width * pageContentH / imgW);
+    var yOffsetPx = 0;
+    while (yOffsetPx < canvas.height) {
+      var sliceCanvas = document.createElement('canvas');
+      sliceCanvas.width  = canvas.width;
+      sliceCanvas.height = Math.min(sliceHpx, canvas.height - yOffsetPx);
+      var ctx = sliceCanvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+      ctx.drawImage(canvas, 0, yOffsetPx, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+      var sliceData = sliceCanvas.toDataURL('image/jpeg', 0.92);
+      var sliceImgH = sliceCanvas.height * imgW / sliceCanvas.width;
+      if (yOffsetPx > 0) pdf.addPage();
+      pdf.addImage(sliceData, 'JPEG', margin, margin, imgW, sliceImgH);
+      yOffsetPx += sliceHpx;
+    }
+  }
+
+  var tNum = getNum().replace('#', '');
+  var fi   = document.getElementById('fi').value;
+  var filename = 'Ticket_Fumigacion_' + tNum + '_' + fi + '.pdf';
+
+  return { pdf: pdf, filename: filename };
+}
+
+// Descarga local (usado por el botón "Solo Descargar PDF")
 async function dlPDF() {
   if (!ticketOK) { alert('Primero generá el ticket.'); return; }
-  var ticket = document.getElementById('previewArea').querySelector('.ticket');
-  if (!ticket) { alert('No se encontró el ticket.'); return; }
-
   var btnPDF  = document.getElementById('btnPDF');
   var btnSend = document.getElementById('btnSend');
   var prevTxt = btnPDF.innerHTML;
   btnPDF.disabled  = true;
   btnSend.disabled = true;
   btnPDF.innerHTML = 'Generando PDF…';
-
   try {
-    // 1) Clonar el ticket a un contenedor offscreen con ancho fijo y fondo blanco
-    //    (evita problemas de escalado y fondos translúcidos)
-    var holder = document.createElement('div');
-    holder.style.cssText = 'position:fixed;left:-10000px;top:0;width:800px;background:#ffffff;padding:20px;font-family:Arial,sans-serif;';
-    var clone = ticket.cloneNode(true);
-    clone.style.maxWidth = '760px';
-    clone.style.margin   = '0 auto';
-    holder.appendChild(clone);
-    document.body.appendChild(holder);
-
-    // 2) Rasterizar con html2canvas a alta resolución (scale 2 = retina)
-    var canvas = await html2canvas(holder, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      logging: false
-    });
-    document.body.removeChild(holder);
-
-    // 3) Crear PDF A4 retrato (mm)
-    var jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-    var pdf = new jsPDFCtor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    var pageW = pdf.internal.pageSize.getWidth();   // 210
-    var pageH = pdf.internal.pageSize.getHeight();  // 297
-    var margin = 10; // mm
-    var imgW = pageW - margin * 2;
-    var imgH = canvas.height * imgW / canvas.width;
-
-    var imgData = canvas.toDataURL('image/jpeg', 0.92);
-
-    // 4) Si el ticket excede una página, partir en varias páginas preservando proporción
-    if (imgH <= pageH - margin * 2) {
-      pdf.addImage(imgData, 'JPEG', margin, margin, imgW, imgH);
-    } else {
-      // Dividir en páginas
-      var pageContentH = pageH - margin * 2; // alto útil por página en mm
-      var sliceHpx = Math.floor(canvas.width * pageContentH / imgW); // alto por página en px del canvas
-      var yOffsetPx = 0;
-      while (yOffsetPx < canvas.height) {
-        var sliceCanvas = document.createElement('canvas');
-        sliceCanvas.width  = canvas.width;
-        sliceCanvas.height = Math.min(sliceHpx, canvas.height - yOffsetPx);
-        var ctx = sliceCanvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-        ctx.drawImage(canvas, 0, yOffsetPx, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
-        var sliceData = sliceCanvas.toDataURL('image/jpeg', 0.92);
-        var sliceImgH = sliceCanvas.height * imgW / sliceCanvas.width;
-        if (yOffsetPx > 0) pdf.addPage();
-        pdf.addImage(sliceData, 'JPEG', margin, margin, imgW, sliceImgH);
-        yOffsetPx += sliceHpx;
-      }
-    }
-
-    // 5) Guardar archivo con nombre del ticket
-    var tNum = getNum().replace('#', '');
-    var fi   = document.getElementById('fi').value;
-    var filename = 'Ticket_Fumigacion_' + tNum + '_' + fi + '.pdf';
-    pdf.save(filename);
-
-    showToast('PDF descargado: ' + filename, '#1a8a4a');
+    var built = await buildPDF();
+    built.pdf.save(built.filename);
+    showToast('PDF descargado: ' + built.filename, '#1a8a4a');
   } catch(err) {
     console.error('Error generando PDF:', err);
     alert('Error al generar el PDF: ' + err.message);
@@ -887,6 +1013,40 @@ async function dlPDF() {
     btnSend.disabled = false;
     btnPDF.innerHTML = prevTxt;
   }
+}
+
+// Envía el ticket al Apps Script (Drive + Sheet). Retorna {ok, ticketNum, pdfUrl} o null si falla.
+async function archiveToDrive(pdfBase64, ticketData) {
+  if (!APPS_SCRIPT_URL || !APPS_SCRIPT_SECRET) {
+    return null; // no configurado, skip archivado
+  }
+  try {
+    var payload = Object.assign({}, ticketData, {
+      secret: APPS_SCRIPT_SECRET,
+      pdfBase64: pdfBase64
+    });
+    // "text/plain" evita el preflight CORS de Apps Script
+    var resp = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'Error desconocido del servidor');
+    return data;
+  } catch(err) {
+    console.error('Error archivando en Drive:', err);
+    return { ok: false, error: err.message };
+  }
+}
+
+// Convierte un jsPDF a base64 (sin el prefijo data:...)
+function pdfToBase64(pdf) {
+  var dataUri = pdf.output('datauristring');
+  // dataUri = "data:application/pdf;filename=...;base64,XXXX"
+  var comma = dataUri.indexOf(',');
+  return dataUri.substring(comma + 1);
 }
 </script>
 </body>
