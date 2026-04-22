@@ -798,10 +798,7 @@ async function sendGmail() {
       'Se adjunta el aviso de fumigación correspondiente.',
       '',
       'Ticket: ' + tNum,
-      'Fecha: ' + fmtL(fi) + ' - ' + hf + ' hs',
-      '',
-      'Saludos,',
-      'Depto. Sanidad & Seguridad - Maniagro Argentina'
+      'Fecha: ' + fmtL(fi) + ' - ' + hf + ' hs'
     ].join('\n');
 
     // Cuerpo HTML rico (lo que va al clipboard y se pega con Ctrl+V en Gmail)
@@ -809,8 +806,7 @@ async function sendGmail() {
     var bodyHTML =
       '<div style="font-family:Arial,sans-serif;font-size:13px;color:#1a1e26;line-height:1.55;">' +
         '<p style="margin:0 0 14px 0;">Estimado/a equipo,</p>' +
-        '<p style="margin:0 0 14px 0;"><img src="' + ticketImgDataURI + '" alt="Ticket de Fumigación ' + escHTML(tNum) + '" style="max-width:680px;width:100%;height:auto;border:1px solid #d6d0c4;border-radius:4px;display:block;"></p>' +
-        '<p style="margin:0;">Saludos,<br><span style="color:#666;font-size:12px;">Depto. Sanidad &amp; Seguridad - Maniagro Argentina</span></p>' +
+        '<p style="margin:0;"><img src="' + ticketImgDataURI + '" alt="Ticket de Fumigación ' + escHTML(tNum) + '" style="max-width:900px;width:100%;height:auto;border:1px solid #d6d0c4;border-radius:4px;display:block;"></p>' +
       '</div>';
 
     var subject = tNum + ' | Aviso de Fumigación - ' + fmtD(fi);
