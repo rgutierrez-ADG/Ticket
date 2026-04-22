@@ -794,8 +794,9 @@ async function sendGmail() {
         fechaReinicio:   fr,
         horaReinicio:    hrf,
         sectores:        selSectors,
-        producto:        prd,
-        lote:            lot,
+        productos:       productos, // arreglo [{prd,lot},...] con solo los cargados
+        producto:        prd,       // fallback compat string combinado
+        lote:            lot,       // fallback compat string combinado
         quimico:         qim,
         generadoPor:     fromAcc,
         destinatarios:   all.map(function(e){ return e.a; }).join('; ')
