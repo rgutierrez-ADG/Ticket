@@ -259,12 +259,32 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
     <div class="sec-lbl">Producto, Lote y Químico</div>
     <div class="two-col">
       <div class="form-group">
-        <label class="f-lbl">Tipo/s de producto</label>
-        <input class="f-inp" type="text" id="producto" placeholder="Ej: Maní, Poroto, Maíz"/>
+        <label class="f-lbl">Producto 1</label>
+        <input class="f-inp" type="text" id="producto1" placeholder="Ej: Maní"/>
       </div>
       <div class="form-group">
-        <label class="f-lbl">Lote/s</label>
-        <input class="f-inp" type="text" id="lotes" placeholder="Ej: L-001, L-002"/>
+        <label class="f-lbl">Lote/s 1</label>
+        <input class="f-inp" type="text" id="lotes1" placeholder="Ej: L-001, L-002"/>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="form-group">
+        <label class="f-lbl">Producto 2 (opcional)</label>
+        <input class="f-inp" type="text" id="producto2" placeholder="Ej: Maíz"/>
+      </div>
+      <div class="form-group">
+        <label class="f-lbl">Lote/s 2</label>
+        <input class="f-inp" type="text" id="lotes2" placeholder="Ej: L-010"/>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="form-group">
+        <label class="f-lbl">Producto 3 (opcional)</label>
+        <input class="f-inp" type="text" id="producto3" placeholder="Ej: Poroto"/>
+      </div>
+      <div class="form-group">
+        <label class="f-lbl">Lote/s 3</label>
+        <input class="f-inp" type="text" id="lotes3" placeholder="Ej: L-025"/>
       </div>
     </div>
     <div class="form-group">
@@ -612,8 +632,12 @@ function genTicket() {
   var hi  = document.getElementById('hi').value;
   var fl  = document.getElementById('fl').value;
   var fr  = document.getElementById('fr').value;
-  var prd = document.getElementById('producto').value.trim();
-  var lot = document.getElementById('lotes').value.trim();
+  // 3 pares producto/lote (solo se usan los que tengan contenido)
+  var productos = [
+    { prd: document.getElementById('producto1').value.trim(), lot: document.getElementById('lotes1').value.trim() },
+    { prd: document.getElementById('producto2').value.trim(), lot: document.getElementById('lotes2').value.trim() },
+    { prd: document.getElementById('producto3').value.trim(), lot: document.getElementById('lotes3').value.trim() }
+  ].filter(function(p){ return p.prd || p.lot; }); // conservar solo filas con al menos producto o lote
   var qim = document.getElementById('quimico').value.trim();
   var hr  = document.getElementById('hr').value;
 
@@ -629,12 +653,24 @@ function genTicket() {
 
   // Producto / Lote / Quimico block
   var pBlock = '';
-  if (prd || lot || qim) {
-    pBlock = '<div class="t-sec"><div class="t-sl">Producto, Lote y Químico</div><div class="t-grid2">';
-    if (prd) pBlock += '<div class="t-card"><span class="t-card-lbl">Tipo/s de Producto</span><span class="t-card-val">'+prd+'</span></div>';
-    if (lot) pBlock += '<div class="t-card"><span class="t-card-lbl">Lote/s</span><span class="t-card-val">'+lot+'</span></div>';
-    if (qim) pBlock += '<div class="t-card" style="border-left-color:#1a8a4a"><span class="t-card-lbl">Químico/s Utilizado/s</span><span class="t-card-val">'+qim+'</span></div>';
-    pBlock += '</div></div>';
+  if (productos.length || qim) {
+    pBlock = '<div class="t-sec"><div class="t-sl">Producto, Lote y Químico</div>';
+    // Mostrar una "fila" por cada producto cargado (producto + lote emparejados)
+    if (productos.length) {
+      pBlock += '<div class="t-grid2" style="margin-bottom:7px;">';
+      productos.forEach(function(p, idx) {
+        var prdTxt = p.prd || '-';
+        var lotTxt = p.lot || '-';
+        var lblSuf = productos.length > 1 ? ' ' + (idx + 1) : '';
+        pBlock += '<div class="t-card"><span class="t-card-lbl">Producto' + lblSuf + '</span><span class="t-card-val">'+prdTxt+'</span></div>';
+        pBlock += '<div class="t-card"><span class="t-card-lbl">Lote/s' + lblSuf + '</span><span class="t-card-val">'+lotTxt+'</span></div>';
+      });
+      pBlock += '</div>';
+    }
+    if (qim) {
+      pBlock += '<div class="t-grid2"><div class="t-card" style="border-left-color:#1a8a4a;grid-column:1 / -1;"><span class="t-card-lbl">Químico/s Utilizado/s</span><span class="t-card-val">'+qim+'</span></div></div>';
+    }
+    pBlock += '</div>';
   }
 
   // Operarios
@@ -710,8 +746,15 @@ async function sendGmail() {
   var fl  = document.getElementById('fl').value;
   var fr  = document.getElementById('fr').value;
   var hr  = document.getElementById('hr').value;
-  var prd = document.getElementById('producto').value.trim();
-  var lot = document.getElementById('lotes').value.trim();
+  // 3 pares producto/lote (solo los que tengan contenido)
+  var productos = [
+    { prd: document.getElementById('producto1').value.trim(), lot: document.getElementById('lotes1').value.trim() },
+    { prd: document.getElementById('producto2').value.trim(), lot: document.getElementById('lotes2').value.trim() },
+    { prd: document.getElementById('producto3').value.trim(), lot: document.getElementById('lotes3').value.trim() }
+  ].filter(function(p){ return p.prd || p.lot; });
+  // Versiones combinadas (para Sheet y compatibilidad con Apps Script actual)
+  var prd = productos.map(function(p){ return p.prd || '-'; }).join(' | ');
+  var lot = productos.map(function(p){ return p.lot || '-'; }).join(' | ');
   var qim = document.getElementById('quimico').value.trim();
   var hf   = hi.slice(0,5);
   var hrf  = hr ? hr.slice(0,5) : '';
@@ -806,7 +849,7 @@ async function sendGmail() {
     var bodyHTML =
       '<div style="font-family:Arial,sans-serif;font-size:13px;color:#1a1e26;line-height:1.55;">' +
         '<p style="margin:0 0 14px 0;">Estimado/a equipo,</p>' +
-        '<p style="margin:0;"><img src="' + ticketImgDataURI + '" alt="Ticket de Fumigación ' + escHTML(tNum) + '" style="width:100%;height:auto;border:1px solid #d6d0c4;border-radius:4px;display:block;"></p>' +
+        '<p style="margin:0;"><img src="' + ticketImgDataURI + '" alt="Ticket de Fumigación ' + escHTML(tNum) + '" style="max-width:1200px;width:100%;height:auto;border:1px solid #d6d0c4;border-radius:4px;display:block;"></p>' +
       '</div>';
 
     var subject = tNum + ' | Aviso de Fumigación - ' + fmtD(fi);
