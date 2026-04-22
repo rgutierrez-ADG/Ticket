@@ -188,33 +188,70 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
   <!-- SECTORES -->
   <div class="form-section">
     <div class="sec-lbl">Sectores Afectados</div>
+
+    <!-- Dropdown SECTORES INTERNOS -->
     <div class="form-group">
-      <label class="f-lbl">Seleccionar sectores</label>
-      <div class="dd-trigger" id="sTrig" onclick="toggleDD('sPanel','sTrig')">
-        <span id="sTrigTxt">Elegir sectores...</span>
+      <label class="f-lbl">Sectores Internos</label>
+      <div class="dd-trigger" id="siTrig" onclick="toggleDD('siPanel','siTrig')">
+        <span id="siTrigTxt">Elegir sectores internos...</span>
         <span class="dd-arrow">&#9660;</span>
       </div>
-      <div class="dd-panel" id="sPanel">
-        <div class="dd-opt"><input type="checkbox" id="s1" value="Deposito D1" onchange="updSectors()"><label for="s1">Deposito D1</label></div>
-        <div class="dd-opt"><input type="checkbox" id="s2" value="Deposito D2" onchange="updSectors()"><label for="s2">Deposito D2</label></div>
-        <div class="dd-opt"><input type="checkbox" id="s3" value="Deposito D3" onchange="updSectors()"><label for="s3">Deposito D3</label></div>
-        <div class="dd-opt"><input type="checkbox" id="s4" value="Producto Elaborado" onchange="updSectors()"><label for="s4">Producto Elaborado</label></div>
-        <div class="dd-sep"></div>
-        <div class="dd-opt"><input type="checkbox" id="s5" value="Pulmon Blanch" onchange="updSectors()"><label for="s5">Pulmon Blanch</label></div>
-        <div class="dd-opt"><input type="checkbox" id="s6" value="Pulmon HPS1" onchange="updSectors()"><label for="s6">Pulmon HPS1</label></div>
-        <div class="dd-opt"><input type="checkbox" id="s7" value="Planta Alergeno" onchange="updSectors()"><label for="s7">Planta Alergeno</label></div>
-        <div class="dd-opt"><input type="checkbox" id="s8" value="Curado" onchange="updSectors()"><label for="s8">Curado</label></div>
-        <div class="dd-opt"><input type="checkbox" id="s9" value="Josa" onchange="updSectors()"><label for="s9">Josa</label></div>
-        <div class="dd-opt"><input type="checkbox" id="s10" value="Alvarez" onchange="updSectors()"><label for="s10">Alvarez</label></div>
-        <div class="dd-sep"></div>
-        <div class="dd-opt"><input type="checkbox" id="s11" value="Deposito de Insumos" onchange="updSectors()"><label for="s11">Deposito de Insumos</label></div>
+      <div class="dd-panel" id="siPanel">
+        <div class="dd-opt"><input type="checkbox" id="si1"  value="Prelimpieza HPS1"          onchange="updSectors()"><label for="si1">Prelimpieza HPS1</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si2"  value="HPS1"                      onchange="updSectors()"><label for="si2">HPS1</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si3"  value="HPS2"                      onchange="updSectors()"><label for="si3">HPS2</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si4"  value="Blancheado"                onchange="updSectors()"><label for="si4">Blancheado</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si5"  value="Depósito pre carga y Carga" onchange="updSectors()"><label for="si5">Depósito pre carga y Carga</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si6"  value="Depósito D1"               onchange="updSectors()"><label for="si6">Depósito D1</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si7"  value="Depósito D2"               onchange="updSectors()"><label for="si7">Depósito D2</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si8"  value="Depósito D3"               onchange="updSectors()"><label for="si8">Depósito D3</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si9"  value="Pulmón Blanch"             onchange="updSectors()"><label for="si9">Pulmón Blanch</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si10" value="Pulmón HPS1"               onchange="updSectors()"><label for="si10">Pulmón HPS1</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si11" value="Insumos"                   onchange="updSectors()"><label for="si11">Insumos</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si12" value="Planta Alérgenos"          onchange="updSectors()"><label for="si12">Planta Alérgenos</label></div>
+        <div class="dd-opt"><input type="checkbox" id="si13" value="Planta Prod. Elaborado"    onchange="updSectors()"><label for="si13">Planta Prod. Elaborado</label></div>
         <div class="dd-acts">
-          <button class="dd-act" onclick="selAll('sPanel'); updSectors()">TODOS</button>
-          <button class="dd-act" onclick="clrAll('sPanel'); updSectors()">NINGUNO</button>
+          <button class="dd-act" onclick="selAll('siPanel'); updSectors()">TODOS</button>
+          <button class="dd-act" onclick="clrAll('siPanel'); updSectors()">NINGUNO</button>
         </div>
       </div>
-      <div class="chips" id="sChips"><span class="chip-none">Ningún sector seleccionado</span></div>
     </div>
+
+    <!-- Dropdown SECTORES EXTERNOS -->
+    <div class="form-group">
+      <label class="f-lbl">Sectores Externos</label>
+      <div class="dd-trigger" id="seTrig" onclick="toggleDD('sePanel','seTrig')">
+        <span id="seTrigTxt">Elegir sectores externos...</span>
+        <span class="dd-arrow">&#9660;</span>
+      </div>
+      <div class="dd-panel" id="sePanel">
+        <div class="dd-opt"><input type="checkbox" id="se1"  value="Perímetro Planta Maní"              onchange="updSectors()"><label for="se1">Perímetro Planta Maní</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se2"  value="Perímetro Planta Prod. Elaborado"   onchange="updSectors()"><label for="se2">Perímetro Planta Prod. Elaborado</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se3"  value="Perímetro Planta Alérgeno"          onchange="updSectors()"><label for="se3">Perímetro Planta Alérgeno</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se4"  value="Contenedor 1 - Alérgenos"           onchange="updSectors()"><label for="se4">Contenedor 1 - Alérgenos</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se5"  value="Contenedor 2"                      onchange="updSectors()"><label for="se5">Contenedor 2</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se6"  value="Depósito Confinado"                onchange="updSectors()"><label for="se6">Depósito Confinado</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se7"  value="Secado de carros"                  onchange="updSectors()"><label for="se7">Secado de carros</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se8"  value="Celda 1"                           onchange="updSectors()"><label for="se8">Celda 1</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se9"  value="Celda 2"                           onchange="updSectors()"><label for="se9">Celda 2</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se10" value="Celda 3"                           onchange="updSectors()"><label for="se10">Celda 3</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se11" value="Celda 4"                           onchange="updSectors()"><label for="se11">Celda 4</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se12" value="Celda 5"                           onchange="updSectors()"><label for="se12">Celda 5</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se13" value="Celda 6"                           onchange="updSectors()"><label for="se13">Celda 6</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se14" value="Celda 7"                           onchange="updSectors()"><label for="se14">Celda 7</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se15" value="Celda 8"                           onchange="updSectors()"><label for="se15">Celda 8</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se16" value="Celda 9"                           onchange="updSectors()"><label for="se16">Celda 9</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se17" value="Celda 10"                          onchange="updSectors()"><label for="se17">Celda 10</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se18" value="Depósito Semilla Agroquímicos"     onchange="updSectors()"><label for="se18">Depósito Semilla Agroquímicos</label></div>
+        <div class="dd-acts">
+          <button class="dd-act" onclick="selAll('sePanel'); updSectors()">TODOS</button>
+          <button class="dd-act" onclick="clrAll('sePanel'); updSectors()">NINGUNO</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chips unificados (internos + externos) -->
+    <div class="chips" id="sChips"><span class="chip-none">Ningún sector seleccionado</span></div>
   </div>
 
   <!-- PRODUCTO LOTE QUIMICO -->
@@ -440,7 +477,8 @@ window.onload = function() {
   // Cargar configuración de Apps Script
   loadCfg();
   document.addEventListener('click', function(ev) {
-    closePanelIfOutside('sPanel','sTrig', ev);
+    closePanelIfOutside('siPanel','siTrig', ev);
+    closePanelIfOutside('sePanel','seTrig', ev);
     closePanelIfOutside('ePanel','eTrig', ev);
   });
 };
@@ -476,10 +514,14 @@ function clrAll(panelId) {
   document.querySelectorAll('#'+panelId+' input[type=checkbox]').forEach(function(c){ c.checked = false; });
 }
 
-// SECTORS
+// SECTORS - lee de ambos dropdowns (internos + externos) y los mezcla
 function updSectors() {
   selSectors = [];
-  document.querySelectorAll('#sPanel input:checked').forEach(function(c){ selSectors.push(c.value); });
+  // Sectores internos
+  document.querySelectorAll('#siPanel input:checked').forEach(function(c){ selSectors.push(c.value); });
+  // Sectores externos
+  document.querySelectorAll('#sePanel input:checked').forEach(function(c){ selSectors.push(c.value); });
+
   var wrap = document.getElementById('sChips');
   if (!selSectors.length) {
     wrap.innerHTML = '<span class="chip-none">Ningún sector seleccionado</span>';
@@ -488,13 +530,20 @@ function updSectors() {
       return '<div class="chip">' + s + '<button class="chip-x" onclick="unchkS(\'' + s.replace(/'/g, "\\'") + '\')">&#215;</button></div>';
     }).join('');
   }
-  var n = selSectors.length;
-  document.getElementById('sTrigTxt').textContent = n
-    ? n + ' sector' + (n>1?'es':'') + ' seleccionado' + (n>1?'s':'')
-    : 'Elegir sectores...';
+
+  // Actualizar textos de los triggers
+  var nInt = document.querySelectorAll('#siPanel input:checked').length;
+  var nExt = document.querySelectorAll('#sePanel input:checked').length;
+  document.getElementById('siTrigTxt').textContent = nInt
+    ? nInt + ' seleccionado' + (nInt>1?'s':'')
+    : 'Elegir sectores internos...';
+  document.getElementById('seTrigTxt').textContent = nExt
+    ? nExt + ' seleccionado' + (nExt>1?'s':'')
+    : 'Elegir sectores externos...';
 }
 function unchkS(v) {
-  document.querySelectorAll('#sPanel input').forEach(function(c){ if(c.value===v) c.checked=false; });
+  // Buscar en ambos paneles y desmarcar donde coincida
+  document.querySelectorAll('#siPanel input, #sePanel input').forEach(function(c){ if(c.value===v) c.checked=false; });
   updSectors();
 }
 
