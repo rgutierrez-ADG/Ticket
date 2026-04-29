@@ -242,7 +242,8 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-hei
         <div class="dd-opt"><input type="checkbox" id="se15" value="Celda 8"                           onchange="updSectors()"><label for="se15">Celda 8</label></div>
         <div class="dd-opt"><input type="checkbox" id="se16" value="Celda 9"                           onchange="updSectors()"><label for="se16">Celda 9</label></div>
         <div class="dd-opt"><input type="checkbox" id="se17" value="Celda 10"                          onchange="updSectors()"><label for="se17">Celda 10</label></div>
-        <div class="dd-opt"><input type="checkbox" id="se18" value="Depósito Semilla Agroquímicos"     onchange="updSectors()"><label for="se18">Depósito Semilla Agroquímicos</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se18" value="Celda 11"                          onchange="updSectors()"><label for="se18">Celda 11</label></div>
+        <div class="dd-opt"><input type="checkbox" id="se19" value="Depósito Semilla Agroquímicos"     onchange="updSectors()"><label for="se19">Depósito Semilla Agroquímicos</label></div>
         <div class="dd-acts">
           <button class="dd-act" onclick="selAll('sePanel'); updSectors()">TODOS</button>
           <button class="dd-act" onclick="clrAll('sePanel'); updSectors()">NINGUNO</button>
@@ -680,7 +681,7 @@ function genTicket() {
   }).join('');
 
   // Contactos
-  var cts = [{n:'Pereyra Isaias Ezequiel',p:'358 514-5055'},{n:'Gutierrez Franco',p:'358 487-4894'},{n:'Mayra Dip',p:'349 341-8445'}];
+  var cts = [{n:'Pereyra Isaias Ezequiel',p:'358-5045662'},{n:'Gutierrez Franco',p:'358 487-4894'},{n:'Mayra Dip',p:'349 341-8445'}];
   var ctsH = cts.map(function(c){
     return '<div class="t-ct"><div class="t-cn">'+c.n+'</div><div class="t-cp">&#128222; '+c.p+'</div></div>';
   }).join('');
@@ -850,7 +851,7 @@ async function sendGmail() {
     var bodyHTML =
       '<div style="font-family:Arial,sans-serif;font-size:13px;color:#1a1e26;line-height:1.55;">' +
         '<p style="margin:0 0 14px 0;">Estimado/a equipo,</p>' +
-        '<p style="margin:0;"><img src="' + ticketImgDataURI + '" alt="Ticket de Fumigación ' + escHTML(tNum) + '" style="max-width:1200px;width:100%;height:auto;border:1px solid #d6d0c4;border-radius:4px;display:block;"></p>' +
+        '<p style="margin:0;"><img src="' + ticketImgDataURI + '" alt="Ticket de Fumigación ' + escHTML(tNum) + '" style="max-width:600px;width:100%;height:auto;border:1px solid #d6d0c4;border-radius:4px;display:block;"></p>' +
       '</div>';
 
     var subject = tNum + ' | Aviso de Fumigación - ' + fmtD(fi);
